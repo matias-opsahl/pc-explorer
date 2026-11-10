@@ -1,37 +1,37 @@
 # pc-explorer
 
-Et 3D-verktøy for å se hva en PC er laget av og sette sammen sin egen. Velg en stasjonær eller bærbar maskin, klikk på en del for å zoome inn og lese hva den gjør, og bytt deler for å se hvordan pris, bildefrekvens og kompatibilitet endrer seg.
+A 3D tool for exploring what a PC is made of and building your own. Choose a desktop or laptop, click on a component to zoom in and learn what it does, and swap components to see how price, frame rate, and compatibility change.
 
-## Kjøre
+## Running the project
 
 ```bash
 npm install
 npm run dev
 ```
 
-Åpne deretter `http://localhost:5173`.
+Then open `http://localhost:5173`.
 
-Andre kommandoer: `npm run build` (typesjekk og produksjonsbygg) og `npm run lint`.
+Other commands: `npm run build` (type-checking and production build) and `npm run lint`.
 
-## Slik er det bygget
+## Project structure
 
-| Mappe | Innhold |
+| Folder | Contents |
 | --- | --- |
-| `src/data` | Delekatalogen, maskinene og alle forklaringstekster |
-| `src/logic/evaluate.ts` | Pris, anslått bildefrekvens, strømtrekk, kompatibilitet og forslag |
-| `src/three` | 3D-modellene, tegnet i kode med Three.js og React Three Fiber |
-| `src/ui` | Paneler og kontroller |
-| `src/store.ts` | Tilstand: valgt maskin, bygg, mål og visning |
+| `src/data` | The component catalog, devices, and all explanatory text |
+| `src/logic/evaluate.ts` | Pricing, estimated frame rates, power consumption, compatibility, and recommendations |
+| `src/three` | 3D models, created programmatically using Three.js and React Three Fiber |
+| `src/ui` | Panels and controls |
+| `src/store.ts` | State management: selected device, build configuration, targets, and view settings |
 
-3D-modellene måles i millimeter. Hver del ligger i en `Part`, som tar seg av klikk, markering, nedtoning og plasseringen i sprengskissen.
+The 3D models are measured in millimeters. Each component is represented by a `Part` that handles clicking, highlighting, dimming, and positioning within the exploded view.
 
-## Legge til en del
+## Adding a component
 
-Legg en ny oppføring i riktig liste i `src/data/catalog.ts`. Den dukker da opp som alternativ i alle stasjonære bygg, og kompatibilitetsreglene gjelder automatisk. For bærbare må delen også føres opp under `options` for maskinen i `src/data/devices.ts`.
+Add a new entry to the appropriate list in `src/data/catalog.ts`. It will then appear as an available option in all desktop builds, with compatibility rules applied automatically. For laptops, the component must also be added to the device's `options` in `src/data/devices.ts`.
 
-## Avgrensninger
+## Limitations
 
-- Priser er omtrentlige norske butikkpriser fra november 2026.
-- Bildefrekvens er grove anslag til sammenligning, ikke målinger.
-- Kabler, lagringsdisker utover én M.2 SSD og vifter som egne deler er utelatt.
-- På bærbare kan bare delene som faktisk selges i flere varianter byttes.
+- Prices are approximate Norwegian retail prices as of November 2026.
+- Frame rates are rough estimates for comparison purposes, not actual benchmark measurements.
+- Cables, storage drives other than one M.2 SSD, and fans as separate components are excluded.
+- For laptops, only components that are actually available in multiple configurations can be swapped.
