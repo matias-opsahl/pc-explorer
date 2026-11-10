@@ -1,4 +1,4 @@
-# Maskinrommet
+# pc-explorer
 
 Et 3D-verktøy for å se hva en PC er laget av og sette sammen sin egen. Velg en stasjonær eller bærbar maskin, klikk på en del for å zoome inn og lese hva den gjør, og bytt deler for å se hvordan pris, bildefrekvens og kompatibilitet endrer seg.
 
