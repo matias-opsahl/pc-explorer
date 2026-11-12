@@ -7,12 +7,15 @@ import { CameraRig } from './CameraRig'
 import { DesktopModel } from './DesktopModel'
 import { LaptopModel } from './LaptopModel'
 
-const STAGE = '#0c1416'
+const LOOK = {
+  dark: { stage: '#0c1416', cell: '#17302f', section: '#27504a', shadow: 0.62, vignette: 0.6, ambient: 0.5 },
+  light: { stage: '#e4ebe6', cell: '#c6d6cd', section: '#9fbcae', shadow: 0.38, vignette: 0.18, ambient: 0.9 },
+}
 
-function Studio() {
+function Studio({ ambient }: { ambient: number }) {
   return (
     <>
-      <ambientLight intensity={0.5} />
+      <ambientLight intensity={ambient} />
       <directionalLight
         castShadow
         position={[6, 11, 8]}
@@ -24,7 +27,7 @@ function Studio() {
         <orthographicCamera attach="shadow-camera" args={[-7, 7, 7, -7, 0.5, 34]} />
       </directionalLight>
       <directionalLight position={[-7, 5, -6]} intensity={1.5} color="#9ad4ff" />
-      {/* Lyskasser som speiler seg i metall og glass. Tegnes én gang. */}
+      {/* Light boxes that reflect in metal and glass. Drawn once. */}
       <Environment resolution={256} frames={1} environmentIntensity={1.35}>
         <color attach="background" args={['#060a0b']} />
         <Lightformer form="rect" intensity={3.2} position={[0, 7, 0]} rotation-x={Math.PI / 2} scale={[12, 12, 1]} />
@@ -37,7 +40,7 @@ function Studio() {
   )
 }
 
-function Floor() {
+function Floor({ look }: { look: (typeof LOOK)['dark'] }) {
   return (
     <>
       <Grid
@@ -45,14 +48,14 @@ function Floor() {
         infiniteGrid
         cellSize={0.5}
         cellThickness={0.7}
-        cellColor="#17302f"
+        cellColor={look.cell}
         sectionSize={2.5}
         sectionThickness={1.1}
-        sectionColor="#27504a"
+        sectionColor={look.section}
         fadeDistance={30}
         fadeStrength={1.8}
       />
-      <ContactShadows position={[0, 0.004, 0]} scale={18} far={6} blur={2.3} opacity={0.62} resolution={1024} color="#000000" />
+      <ContactShadows position={[0, 0.004, 0]} scale={18} far={6} blur={2.3} opacity={look.shadow} resolution={1024} color="#000000" />
     </>
   )
 }
@@ -60,6 +63,7 @@ function Floor() {
 export function Scene() {
   const device = useDevice()
   const build = useBuild()
+  const look = LOOK[useStore((s) => s.theme)]
   return (
     <Canvas
       shadows
@@ -71,17 +75,17 @@ export function Scene() {
         if (s.mode === 'inspect' && s.selected) s.select(null)
       }}
     >
-      <color attach="background" args={[STAGE]} />
-      <fog attach="fog" args={[STAGE, 26, 70]} />
-      <Studio />
-      <Floor />
+      <color attach="background" args={[look.stage]} />
+      <fog attach="fog" args={[look.stage, 26, 70]} />
+      <Studio ambient={look.ambient} />
+      <Floor look={look} />
       <group key={device.id}>
         {device.kind === 'desktop' ? <DesktopModel build={build} /> : <LaptopModel device={device} build={build} />}
       </group>
       <CameraRig />
       <EffectComposer multisampling={4}>
         <Bloom mipmapBlur luminanceThreshold={1.35} luminanceSmoothing={0.2} intensity={0.55} radius={0.72} />
-        <Vignette offset={0.22} darkness={0.6} />
+        <Vignette offset={0.22} darkness={look.vignette} />
         <ToneMapping mode={ToneMappingMode.NEUTRAL} />
       </EffectComposer>
     </Canvas>

@@ -9,11 +9,11 @@ type V3 = [number, number, number]
 interface Handle {
   group: THREE.Group
   explode: V3
-  /** Hvor langt ut delen er akkurat nå, 0–1 */
+  /** How far out the part is right now, 0–1 */
   ex: number
 }
 
-/** Alle deler som er tegnet akkurat nå, per plass. Kameraet bruker dette til å finne dem. */
+/** All parts currently drawn, per slot. The camera uses this to find them. */
 const registry = new Map<SlotId, Set<Handle>>()
 
 const _box = new THREE.Box3()
@@ -22,7 +22,7 @@ const _b = new THREE.Vector3()
 
 const byGroup = new WeakMap<THREE.Object3D, Handle>()
 
-/** Omrisset av en plass slik det blir når animasjonen er ferdig */
+/** The outline of a slot as it looks when the animation is finished */
 export function slotBox(slot: SlotId, exploded: boolean, out = new THREE.Box3()): THREE.Box3 {
   out.makeEmpty()
   const set = registry.get(slot)
@@ -30,7 +30,7 @@ export function slotBox(slot: SlotId, exploded: boolean, out = new THREE.Box3())
   for (const h of set) {
     _box.setFromObject(h.group)
     if (_box.isEmpty()) continue
-    // Delen selv og eventuelle deler den ligger inni kan fortsatt være på vei
+    // The part itself and any parts inside it may still be on the way
     for (let o: THREE.Object3D | null = h.group; o; o = o.parent) {
       const part = byGroup.get(o)
       if (!part || !o.parent) continue
@@ -66,7 +66,7 @@ function applyMaterial(m: Mat, ghost: number, hl: number, dense: boolean, fade?:
     keep?: number
   }
   if (ud.o0 === undefined) {
-    // Lyse flater synes mye bedre enn mørke når de er gjennomsiktige, så de tones lenger ned
+    // Light surfaces look much better than dark ones when transparent, so they are toned down further
     const c = m.color
     const lum = c ? (c.r + c.g + c.b) / 3 : 0
     ud.keep = THREE.MathUtils.lerp(0.1, 0.03, Math.min(1, lum * 2.2))
@@ -78,7 +78,7 @@ function applyMaterial(m: Mat, ghost: number, hl: number, dense: boolean, fade?:
       ud.ei0 = m.emissiveIntensity
     }
   }
-  // Mange tynne ribber oppå hverandre blir en grå tåke, så de fjernes helt. Tekst dempes ekstra.
+  // Many thin fins on top of each other become a grey haze, so they are removed entirely. Text is dimmed extra.
   m.opacity = ud.o0 * (1 - ghost * (dense ? 1 : fade ?? (ud.t0 ? 0.97 : 1 - ud.keep!)))
   const transparent = ud.t0! || ghost > 0.004
   if (m.transparent !== transparent) {
@@ -92,7 +92,7 @@ function applyMaterial(m: Mat, ghost: number, hl: number, dense: boolean, fade?:
   }
 }
 
-/** Går gjennom delens egne objekter, men ikke inn i deler som ligger inni den */
+/** Walks through the part's own objects, but not into parts that lie inside it */
 function walk(o: THREE.Object3D, fn: (m: THREE.Mesh) => void) {
   if ((o as THREE.Mesh).isMesh) fn(o as THREE.Mesh)
   for (const c of o.children) if (!c.userData.partRoot) walk(c, fn)
@@ -102,15 +102,15 @@ const damp = THREE.MathUtils.damp
 
 interface Props {
   slot: SlotId
-  /** Hvor delen flytter seg i sprengskissen, i millimeter */
+  /** Where the part moves in the exploded view, in millimeters */
   explode?: V3
-  /** Endres denne, blinker delen kort for å vise at den er byttet */
+  /** If this changes, the part flashes briefly to show that it was swapped */
   flash?: string
-  /** Rekkefølge i sammenstillingen når maskinen dukker opp */
+  /** Order in the assembly when the machine appears */
   order?: number
-  /** Delen flytter seg unna når en av disse velges, fordi den ligger i veien for dem */
+  /** The part moves away when one of these is selected, because it is in their way */
   liftFor?: SlotId[]
-  /** Hvor mye delen forsvinner når en annen del er valgt (0–1). Brukes på deler som ligger som lokk over andre. */
+  /** How much the part fades out when another part is selected (0–1). Used on parts that sit as lids over others. */
   fade?: number
   children: ReactNode
 }
@@ -151,7 +151,7 @@ export function Part({ slot, explode = [0, 0, 0], flash, order = 0, liftFor, fad
 
     const lifted = !!selected && !!liftFor?.includes(selected)
     const exTarget = (exploded || lifted) && mode === 'inspect' ? 1 : 0
-    // Delene starts spredt og faller på plass etter tur
+    // The parts start scattered and fall into place one by one
     const wait = 0.15 + order * 0.07
     if (s.age > wait) h.ex = damp(h.ex, exTarget, exTarget ? 5 : 4.2, dt)
     if (Math.abs(h.ex - exTarget) < 0.0005) h.ex = exTarget
@@ -164,7 +164,7 @@ export function Part({ slot, explode = [0, 0, 0], flash, order = 0, liftFor, fad
     s.ghost = damp(s.ghost, ghostT, 9, dt)
     s.hl = damp(s.hl, hlT, 14, dt)
     s.flash = damp(s.flash, 0, 3.5, dt)
-    // Nye objekter kan ha kommet til etter et bytte, så alt friskes opp med jevne mellomrom
+    // New objects may have arrived after a swap, so everything is refreshed at regular intervals
     if (!moving && s.frame++ % 12 !== 0) return
     const hl = Math.max(s.hl, s.flash)
     const cast = s.ghost < 0.5
@@ -181,7 +181,7 @@ export function Part({ slot, explode = [0, 0, 0], flash, order = 0, liftFor, fad
     })
   })
 
-  // En del som er tonet helt bort skal ikke fange pekeren – da treffer du det som ligger bak
+  // A part that is faded out completely should not catch the pointer – then you hit what is behind it
   const active = () => {
     const s = useStore.getState()
     if (s.mode !== 'inspect') return false

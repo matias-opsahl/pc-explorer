@@ -56,7 +56,7 @@ export function Inspector({ slot }: { slot: SlotId }) {
   const now = useEvaluation()
   const swap = useStore((s) => s.swap)
   const select = useStore((s) => s.select)
-  const c = component(build, slot)!
+  const c = component(build, slot)
   const text = slotText(device.kind, slot)
   const mine = now.issues.filter((i) => i.slots.includes(slot))
 
@@ -72,7 +72,15 @@ export function Inspector({ slot }: { slot: SlotId }) {
   }, [device, build, goal, slot, now])
 
   const laptop = device.kind === 'laptop'
-  const priceLine = laptop ? (c.price ? `${signedKr(c.price)} på grunnmodellen` : 'Følger med grunnmodellen') : c.price ? kr(c.price) : 'Følger med prosessoren'
+  const priceLine = !c
+    ? 'Nothing installed yet. Choose a part below.'
+    : laptop
+    ? c.price
+      ? `${signedKr(c.price)} on the base model`
+      : 'Included in the base model'
+    : c.price
+      ? kr(c.price)
+      : 'Included with the processor'
 
   return (
     <div className="inspector" key={slot}>
@@ -82,10 +90,10 @@ export function Inspector({ slot }: { slot: SlotId }) {
           {text.label}
         </span>
         <button className="ghost" onClick={() => select(null)}>
-          Lukk
+          Close
         </button>
       </div>
-      <h2>{c.name}</h2>
+      <h2>{c ? c.name : `No ${text.label.toLowerCase()} yet`}</h2>
       <p className="priceline">{priceLine}</p>
 
       {mine.map((i) => (
@@ -95,22 +103,26 @@ export function Inspector({ slot }: { slot: SlotId }) {
       <p className="what">{text.what}</p>
       <p className="gaming">{text.gaming}</p>
 
-      <h3>Spesifikasjoner</h3>
-      <p className="aside">Trykk på en rad for forklaring.</p>
-      <Specs c={c} />
+      {c && (
+        <>
+          <h3>Specifications</h3>
+          <p className="aside">Tap a row for an explanation.</p>
+          <Specs c={c} />
+        </>
+      )}
 
-      <h3>{laptop ? 'Velg en annen' : 'Bytt del'}</h3>
+      <h3>{!c ? 'Choose a part' : laptop ? 'Choose another' : 'Swap part'}</h3>
       {options.length > 1 ? (
         <>
           {device.fixed?.[slot] && <p className="aside">{device.fixed[slot]}</p>}
           <ul className="options">
             {options.map(({ alt, dPrice, dFps, worst, why }) => {
-              const current = alt.id === c.id
+              const current = alt.id === c?.id
               return (
                 <li key={alt.id}>
                   <button className="option" aria-pressed={current} data-level={worst ?? 'ok'} onClick={() => !current && swap(slot, alt.id)}>
                     <span className="oname">{alt.short}</span>
-                    <span className="oprice">{current ? 'Valgt' : signedKr(dPrice)}</span>
+                    <span className="oprice">{current ? 'Selected' : c ? signedKr(dPrice) : kr(alt.price)}</span>
                     <span className="ochips">
                       {chips(alt).map((ch) => (
                         <span key={ch}>{ch}</span>
@@ -135,7 +147,7 @@ export function Inspector({ slot }: { slot: SlotId }) {
           </ul>
         </>
       ) : (
-        <p className="fixed">{device.fixed?.[slot] ?? 'Denne delen er bygget inn i maskinen og kan ikke byttes.'}</p>
+        <p className="fixed">{device.fixed?.[slot] ?? 'This part is built into the machine and cannot be swapped.'}</p>
       )}
     </div>
   )

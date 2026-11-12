@@ -10,13 +10,13 @@ import { Alu, Boxes, Bx, Copper, Fins, Gold, Label, Led, Plastic, roundedRect, t
 import { pcbTexture, screenTexture, textTexture } from './textures'
 
 /*
- * Millimeter. x går fra venstre mot høyre, y oppover fra bordet, z mot deg.
- * Hengselen ligger altså på negativ z.
+ * Millimeters. x runs from left to right, y upward from the table, z toward you.
+ * The hinge is therefore on negative z.
  */
 
 const HALF = Math.PI / 2
 
-/** Legger en flat form ned på bordet: formens y blir −z, og tykkelsen går oppover */
+/** Lays a flat shape down on the table: the shape's y becomes −z, and the thickness goes upward */
 function plate(shape: THREE.Shape, t: number, uv = false) {
   const g = new THREE.ExtrudeGeometry(shape, { depth: t, bevelEnabled: false, curveSegments: 32 })
   g.rotateX(-HALF)
@@ -102,7 +102,7 @@ function Chip({ at, size, die, vram = 0 }: { at: V3; size: number; die: [number,
         <meshStandardMaterial color="#56606e" metalness={0.85} roughness={0.3} />
       </Bx>
       {Array.from({ length: vram }, (_, i) => {
-        // Minnebrikkene ligger i en vinkel rundt grafikkbrikken
+        // The memory chips sit at an angle around the graphics chip
         const side = i < 4
         const k = side ? i : i - 4
         const px = side ? x + size / 2 + 5 : x - size / 2 + k * 16
@@ -132,11 +132,11 @@ export function LaptopModel({ device, build }: { device: DeviceDef; build: Build
   const yB = 1.5
   const floorY = yB + 2.5
   const topY = yB + baseT
-  const yP = floorY + 2.7 // overflaten på hovedkortet
+  const yP = floorY + 2.7 // the surface of the motherboard
   const [bw, bd] = g.battery
   const bh = Math.min(8, baseT - 8.5)
   const zBatt = d / 2 - 13 - bd // batteriets bakkant
-  const zb = zBatt - 6 // hovedkortets forkant
+  const zb = zBatt - 6 // the front edge of the motherboard
   const fr = Math.min(36, w * 0.1)
   const fx = w / 2 - 20 - fr
   const fz = -d / 2 + 26 + fr
@@ -144,7 +144,7 @@ export function LaptopModel({ device, build }: { device: DeviceDef; build: Build
   const cz = -d / 2 + 78
   const cx = -w * 0.115
   const gx = w * 0.12
-  const soldered = ram.form === 'Loddet'
+  const soldered = ram.form === 'Soldered'
   const keyGlow = g.keyGlow === '#6fd3ff' ? rgb : g.keyGlow
 
   const geo = useMemo(() => {
@@ -193,7 +193,7 @@ export function LaptopModel({ device, build }: { device: DeviceDef; build: Build
   }, [cols, kx0, kz0, topY])
   const padD = Math.min(84, d / 2 - (kz0 + 6 * 19) - 6)
 
-  // Skjerm
+  // Display
   const diagMm = g.diag * 25.4
   const sh = diagMm / Math.sqrt(1 + g.aspect * g.aspect)
   const sw = sh * g.aspect
@@ -202,7 +202,7 @@ export function LaptopModel({ device, build }: { device: DeviceDef; build: Build
 
   const battTex = textTexture(512, 128, [
     { t: `${battery.wh} Wh`, size: 70, weight: 700, color: '#c9ced6', y: 0.4, x: 0.05, align: 'left' },
-    { t: 'LITIUM-ION  ·  15,4 V', size: 30, weight: 500, color: '#727984', y: 0.78, x: 0.05, align: 'left', spacing: 3 },
+    { t: 'LITHIUM-ION  ·  15.4 V', size: 30, weight: 500, color: '#727984', y: 0.78, x: 0.05, align: 'left', spacing: 3 },
   ])
   const ramTex = textTexture(512, 128, [
     { t: `${ram.perStick} GB`, size: 64, weight: 700, color: '#15171a', y: 0.36, x: 0.06, align: 'left' },
@@ -253,7 +253,7 @@ export function LaptopModel({ device, build }: { device: DeviceDef; build: Build
         </Bx>
       </Part>
 
-      {/* Hovedkort */}
+      {/* Motherboard */}
       <Part slot="motherboard" explode={boardOut} order={2}>
         <mesh geometry={geo.board} position={[0, floorY + 1.5, 0]}>
           <meshStandardMaterial map={pcbTexture('green')} roughness={0.55} metalness={0.2} />
@@ -270,7 +270,7 @@ export function LaptopModel({ device, build }: { device: DeviceDef; build: Build
             </Bx>
           )),
         )}
-        {/* Trådløskort */}
+        {/* Wireless card */}
         <Bx at={[-w * 0.34, yP + 1.6, zb - 30]} size={[30, 1, 22]}>
           <meshStandardMaterial color="#12406e" roughness={0.5} />
         </Bx>
@@ -295,7 +295,7 @@ export function LaptopModel({ device, build }: { device: DeviceDef; build: Build
         <Chip at={[gx + 4, yP, cz]} size={38} die={[21 + gpu.vram * 0.25, 18]} vram={Math.min(8, gpu.vram / 2)} />
       </Part>
 
-      {/* Minne */}
+      {/* Memory */}
       <Part slot="ram" explode={soldered ? boardOut : [0, 88, 0]} flash={ram.id} order={3} fade={soldered ? undefined : 1}>
         {soldered
           ? [0, 1, 2, 3].map((i) => (
@@ -326,7 +326,7 @@ export function LaptopModel({ device, build }: { device: DeviceDef; build: Build
             })}
       </Part>
 
-      {/* Lagring */}
+      {/* Storage */}
       <Part slot="storage" explode={[0, 88, 0]} flash={ssd.id} order={3} fade={1}>
         <group position={[w * 0.2, yP + 3.2, zb - 28]}>
           <Bx at={[0, 0, 0]} size={[80, 0.9, 22]}>
@@ -346,7 +346,7 @@ export function LaptopModel({ device, build }: { device: DeviceDef; build: Build
         </group>
       </Part>
 
-      {/* Kjøling */}
+      {/* Cooling */}
       <Part slot="cooler" explode={[0, 130, 0]} order={4} liftFor={['cpu', 'gpu']} fade={1}>
         {[-1, 1].map((s) => (
           <group key={s}>
@@ -378,7 +378,7 @@ export function LaptopModel({ device, build }: { device: DeviceDef; build: Build
         )}
       </Part>
 
-      {/* Overdel med tastatur, og lokket hengslet bakerst */}
+      {/* Upper part with keyboard, and the lid hinged at the back */}
       <Part slot="case" explode={[0, 220, 0]} order={5} fade={1}>
         <RoundedBox args={[w, 2.5, d]} radius={1.1} smoothness={3} position={[0, topY - 1.25, 0]}>
           <Alu color={g.deck} roughness={0.5} metalness={0.55} />

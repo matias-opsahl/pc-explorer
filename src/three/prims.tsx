@@ -5,7 +5,7 @@ import { perforated } from './textures'
 
 export type V3 = [number, number, number]
 
-/** Boks plassert etter hjørnet med lavest x, y og z – enklere å måle opp enn midtpunkt */
+/** Box positioned by the corner with the lowest x, y and z – easier to measure than the center point */
 export function Bx({ at, size, children, ...rest }: { at: V3; size: V3; children?: ReactNode } & ThreeElements['mesh']) {
   return (
     <mesh position={[at[0] + size[0] / 2, at[1] + size[1] / 2, at[2] + size[2] / 2]} {...rest}>
@@ -32,7 +32,7 @@ export const Led = ({ color, intensity = 2.6 }: { color: string; intensity?: num
   <meshStandardMaterial color={color} emissive={color} emissiveIntensity={intensity} roughness={0.4} />
 )
 
-/** Perforert plate: hullene er ekte hull, så du ser viftene bak */
+/** Perforated plate: the holes are real holes, so you can see the fans behind */
 export function MeshPanel({
   size,
   color,
@@ -55,7 +55,7 @@ export function MeshPanel({
   )
 }
 
-/** Tekst eller merke lagt flatt oppå en overflate */
+/** Text or marking laid flat on top of a surface */
 export function Label({
   tex,
   size,
@@ -80,7 +80,7 @@ export function Label({
   )
 }
 
-/** Mange like bokser tegnet i ett kall – brukes til kjøleribber og taster */
+/** Many identical boxes drawn in one call – used for cooling fins and keys */
 export function Boxes({
   size,
   positions,
@@ -110,7 +110,7 @@ export function Boxes({
   )
 }
 
-/** Ribber stablet langs én akse fra `from` til `to` */
+/** Fins stacked along one axis from `from` to `to` */
 export function Fins({
   axis,
   from,
@@ -124,9 +124,9 @@ export function Fins({
   from: number
   to: number
   pitch: number
-  /** Midtpunkt i de to andre aksene (verdien på `axis` ignoreres) */
+  /** Center in the two other axes (the value of `axis` is ignored) */
   center: V3
-  /** Ribbens størrelse (tykkelsen langs `axis`) */
+  /** Fin size (the thickness along `axis`) */
   plate: V3
   color?: string
 }) {
@@ -251,7 +251,7 @@ export function Rotor({
   )
 }
 
-/** Komplett kabinettvifte med ramme. Luften går langs lokal z-akse. */
+/** Complete case fan with frame. The air flows along the local z-axis. */
 export function Fan({
   size = 120,
   depth = 25,
@@ -291,7 +291,7 @@ export function Fan({
   )
 }
 
-/** Avrundet rektangel som flat form, til plater med hull */
+/** Rounded rectangle as a flat shape, for plates with holes */
 export function roundedRect(w: number, h: number, r: number, x = 0, y = 0): THREE.Shape {
   const s = new THREE.Shape()
   s.moveTo(x + r, y)

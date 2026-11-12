@@ -8,8 +8,8 @@ import { Alu, Bx, Copper, Fan, Fins, Gold, Label, Led, MeshPanel, Plastic, Rotor
 import { pcbTexture, textTexture } from './textures'
 
 /*
- * Alt måles i millimeter. x går fra bakveggen mot fronten, y oppover fra bunnen,
- * og z fra høyre sidepanel mot glasset. Hovedkortet står altså i xy-planet.
+ * Everything is measured in millimeters. x runs from the back wall to the front, y upward from the bottom,
+ * and z from the right side panel toward the glass. The motherboard therefore lies in the xy-plane.
  */
 
 const PCB = 1.6
@@ -19,7 +19,7 @@ const DIMM_U = [178, 187.5, 197, 206.5]
 const PCIE_V = 165
 const HALF = Math.PI / 2
 
-function layout(cs: Case, mb: Motherboard) {
+function layout(cs: Case, mb?: Motherboard) {
   const { w: W, h: H, d: D } = cs.dims
   const tray = Math.max(18, W - cs.coolerMax - 20)
   const boardZ = tray + 7
@@ -28,7 +28,8 @@ function layout(cs: Case, mb: Motherboard) {
   const boardTop = H - 46
   return {
     W, H, D, tray, boardZ, surf, boardX, boardTop,
-    board: BOARD[mb.form],
+    // Without a motherboard the tray is laid out for the largest board the case takes
+    board: BOARD[mb?.form ?? (cs.forms.includes('ATX') ? 'ATX' : 'mATX')],
     shroudTop: 112,
     sx: boardX + SOCKET.u,
     sy: boardTop - SOCKET.v,
@@ -37,7 +38,7 @@ function layout(cs: Case, mb: Motherboard) {
 }
 type L = ReturnType<typeof layout>
 
-// ───────────────────────────── Kabinett ─────────────────────────────
+// ───────────────────────────── Case ─────────────────────────────
 
 function CaseModel({ cs, l, rgb, glass }: { cs: Case; l: L; rgb: string; glass: boolean }) {
   const { W, H, D, tray, shroudTop, boardTop, boardX, board } = l
@@ -66,7 +67,7 @@ function CaseModel({ cs, l, rgb, glass }: { cs: Case; l: L; rgb: string; glass: 
   return (
     <>
       <Part slot="case" order={0}>
-        {/* Bunn, høyre side og tak */}
+        {/* Bottom, right side and top */}
         {S([0, -t, 0], [D, t, W])}
         {S([0, 0, -t], [D, H, t])}
         {S([0, H, 0], [34, t, W])}
@@ -75,7 +76,7 @@ function CaseModel({ cs, l, rgb, glass }: { cs: Case; l: L; rgb: string; glass: 
         {S([34, H, W - 14], [D - 84, t, 14])}
         <MeshPanel size={[D - 84, W - 28]} color={body} position={[34 + (D - 84) / 2, H + 1, W / 2]} rotation={[-HALF, 0, 0]} />
 
-        {/* Bakvegg: I/O-felt, viftegitter, utvidelsesspor og åpning til strømforsyningen */}
+        {/* Back wall: I/O panel, fan grille, expansion slots and opening for the power supply */}
         {S([-t, boardTop + 12, 0], [t, H - boardTop - 12, W])}
         {S([-t, boardTop - 165, 0], [t, 177, tray + 55])}
         <Bx at={[-t - 0.7, boardTop - 160, tray + 9]} size={[0.9, 162, 46]}>
@@ -103,7 +104,7 @@ function CaseModel({ cs, l, rgb, glass }: { cs: Case; l: L; rgb: string; glass: 
         {S([-t, 92, tray + 4], [t, 8, 154])}
         {S([-t, 0, tray + 4], [t, 3, 154])}
 
-        {/* Hovedkortbrett med kabelgjennomføringer */}
+        {/* Motherboard tray with cable grommets */}
         {S([0, shroudTop, tray - t], [D - 58, H - shroudTop, t], inner)}
         {[70, 155, 240].map(
           (v) =>
@@ -114,7 +115,7 @@ function CaseModel({ cs, l, rgb, glass }: { cs: Case; l: L; rgb: string; glass: 
             ),
         )}
 
-        {/* Deksel over strømforsyningen */}
+        {/* Cover over the power supply */}
         {S([0, shroudTop - t, tray], [D - 62, t, W - tray - 3], inner)}
         {S([0, 0, W - 5], [D - 62, shroudTop, t], inner)}
         {S([D - 64, 0, tray], [t, shroudTop, W - tray - 3], inner)}
@@ -142,7 +143,7 @@ function CaseModel({ cs, l, rgb, glass }: { cs: Case; l: L; rgb: string; glass: 
           </>
         )}
 
-        {/* Føtter og knapper på toppen */}
+        {/* Feet and buttons on top */}
         {[24, D - 70].map((x) =>
           [14, W - 40].map((z) => (
             <Bx key={`${x}${z}`} at={[x, -18, z]} size={[46, 16, 26]}>
@@ -209,7 +210,7 @@ function CaseModel({ cs, l, rgb, glass }: { cs: Case; l: L; rgb: string; glass: 
   )
 }
 
-// ───────────────────────────── Hovedkort ─────────────────────────────
+// ───────────────────────────── Motherboard ─────────────────────────────
 
 function Heatsink({ at, size, n = 5, axis = 1, color = '#2b2f36' }: { at: V3; size: V3; n?: number; axis?: 0 | 1; color?: string }) {
   const base = size[2] * 0.5
@@ -244,7 +245,7 @@ function MotherboardModel({ mb, l, rgb }: { mb: Motherboard; l: L; rgb: string }
     { t: mb.chipset, size: 84, weight: 700, color: '#c9ced6', y: 0.44 },
     { t: mb.brand.toUpperCase(), size: 40, weight: 500, color: '#7b828c', y: 0.72, spacing: 4 },
   ])
-  // u/v er avstand fra kortets bakre og øvre kant
+  // u/v is the distance from the card's rear and upper edge
   const on = (u: number, v: number, len: number, z = 0): V3 => [u, -(v + len), PCB + z]
   const slot = (v: number, shielded: boolean) => (
     <>
@@ -272,7 +273,7 @@ function MotherboardModel({ mb, l, rgb }: { mb: Motherboard; l: L; rgb: string }
         <meshStandardMaterial map={tex} roughness={0.55} metalness={0.25} />
       </Bx>
 
-      {/* I/O-deksel og porter som stikker ut bak */}
+      {/* I/O cover and ports sticking out the back */}
       <Bx at={on(0, 4, 138)} size={[46, 138, 38]}>
         <Plastic color="#17191d" />
       </Bx>
@@ -283,7 +284,7 @@ function MotherboardModel({ mb, l, rgb }: { mb: Motherboard; l: L; rgb: string }
         <Alu color="#9097a0" />
       </Bx>
 
-      {/* Kjøleribber over spenningsregulatorene (VRM) */}
+      {/* Cooling fins over the voltage regulators (VRM) */}
       <Heatsink at={on(50, 22, 96)} size={[20, 96, 30]} n={7} />
       <Heatsink at={on(74, 5, 20)} size={[86, 20, 26]} n={6} axis={0} />
       {Array.from({ length: 8 }, (_, i) => (
@@ -320,7 +321,7 @@ function MotherboardModel({ mb, l, rgb }: { mb: Motherboard; l: L; rgb: string }
         <Alu color="#c8ccd2" />
       </Bx>
 
-      {/* Minnespor */}
+      {/* Memory slots */}
       {DIMM_U.map((u, i) => (
         <group key={u}>
           <Bx at={on(u - 3.3, 10, 142)} size={[6.6, 142, 7.5]}>
@@ -335,7 +336,7 @@ function MotherboardModel({ mb, l, rgb }: { mb: Motherboard; l: L; rgb: string }
         <Plastic color="#0c0d0f" />
       </Bx>
 
-      {/* M.2-plasser med kjøleplate, utvidelsesspor og brikkesett */}
+      {/* M.2 slots with heatsink, expansion slots and chipset */}
       {m2(90, 123, 92, 5.5)}
       <Bx at={on(92, 132, 8, 0)} size={[5, 8, 5.5]}>
         <Plastic color="#0c0d0f" />
@@ -403,7 +404,7 @@ function CpuModel({ cpu, l }: { cpu: Cpu; l: L }) {
   )
 }
 
-// ───────────────────────────── CPU-kjøler ─────────────────────────────
+// ───────────────────────────── CPU cooler ─────────────────────────────
 
 function Tower({ x, y, z, h, wide, depth }: { x: number; y: number; z: number; h: number; wide: number; depth: number }) {
   return (
@@ -422,7 +423,7 @@ function Tower({ x, y, z, h, wide, depth }: { x: number; y: number; z: number; h
   )
 }
 
-/** Slange mellom pumpe og radiator */
+/** Hose between pump and radiator */
 function Hose({ points }: { points: V3[] }) {
   const key = points.flat().join(',')
   const g = useMemo(
@@ -515,7 +516,7 @@ function CoolerModel({ cooler, cs, l, rgb }: { cooler: Cooler; cs: Case; l: L; r
         {[-9, 9].map((dz) => (
           <Hose key={dz} points={hose(dz)} />
         ))}
-        {/* Radiator i toppen med vifter under */}
+        {/* Radiator at the top with fans underneath */}
         <Bx at={[x0, yr, zr]} size={[radLen, 27, 120]}>
           <Steel color="#0d0e10" roughness={0.6} />
         </Bx>
@@ -552,7 +553,7 @@ function CoolerModel({ cooler, cs, l, rgb }: { cooler: Cooler; cs: Case; l: L; r
       </>
     )
   }
-  // To tårn, forskjøvet litt bakover så frontviften går klar av minnet
+  // Two towers, shifted slightly back so the front fan clears the memory
   const c = sx - 12
   return (
     <>
@@ -569,7 +570,7 @@ function CoolerModel({ cooler, cs, l, rgb }: { cooler: Cooler; cs: Case; l: L; r
   )
 }
 
-// ───────────────────────────── Minne ─────────────────────────────
+// ───────────────────────────── Memory ─────────────────────────────
 
 function RamModel({ ram, l, rgb }: { ram: Ram; l: L; rgb: string }) {
   const slots = ram.sticks >= 4 ? [0, 1, 2, 3] : ram.sticks === 2 ? [1, 3] : [1]
@@ -610,7 +611,7 @@ function RamModel({ ram, l, rgb }: { ram: Ram; l: L; rgb: string }) {
   )
 }
 
-// ───────────────────────────── Skjermkort ─────────────────────────────
+// ───────────────────────────── Graphics card ─────────────────────────────
 
 const GPU_LOOK = {
   NVIDIA: { shroud: '#1b1d21', plate: '#25282d', accent: '#76b900', logo: 'GEFORCE RTX' },
@@ -629,7 +630,7 @@ function GpuModel({ gpu, l, rgb }: { gpu: Gpu; l: L; rgb: string }) {
   const rows = Math.ceil(gpu.slots)
 
   const { shroud, plate } = useMemo(() => {
-    // Viftedeksel på undersiden, med ett hull per vifte
+    // Fan cover on the underside, with one hole per fan
     const s = roundedRect(Lg - 4, Hc, 6, 4, 0)
     for (let i = 0; i < n; i++) {
       const hole = new THREE.Path()
@@ -638,7 +639,7 @@ function GpuModel({ gpu, l, rgb }: { gpu: Gpu; l: L; rgb: string }) {
     }
     const shroud = new THREE.ExtrudeGeometry(s, { depth: 6, bevelEnabled: false, curveSegments: 36 })
     shroud.rotateX(HALF)
-    // Bakplate med åpning der luften blåser rett gjennom
+    // Back plate with an opening where the air blows straight through
     const p = roundedRect(Lg - 2, Hc - 2, 4, 2, 1)
     if (Lg > 265) {
       const hole = new THREE.Path()
@@ -683,9 +684,9 @@ function GpuModel({ gpu, l, rgb }: { gpu: Gpu; l: L; rgb: string }) {
       <group position={[Lg * 0.3, 4.7, Hc / 2]} rotation={[-HALF, 0, 0]}>
         <Label tex={model} size={[Math.min(120, Lg * 0.36), Math.min(30, Lg * 0.09)]} />
       </group>
-      {/* Kjøleribber */}
+      {/* Cooling fins */}
       <Fins axis={0} from={10} to={Lg - 8} pitch={3.3} center={[0, (12 - T) / 2, Hc / 2]} plate={[0.7, T - 18, Hc - 14]} color="#7d838c" />
-      {/* Deksel og sider */}
+      {/* Cover and sides */}
       <mesh geometry={shroud} position={[0, -T + 6, 0]}>
         <Plastic color={look.shroud} />
       </mesh>
@@ -705,7 +706,7 @@ function GpuModel({ gpu, l, rgb }: { gpu: Gpu; l: L; rgb: string }) {
       <Bx at={[Lg * 0.08, -T + 4, Hc - 0.4]} size={[Lg * 0.2, 1.4, 1.2]} userData={{ noShadow: true }}>
         <Led color={look.accent} intensity={1.8} />
       </Bx>
-      {/* Strømkontakt */}
+      {/* Power connector */}
       <Bx at={[Lg * 0.6, -13, Hc]} size={[pins === 1 && gpu.connector === '12V-2x6' ? 22 : 19 * pins, 9, 7]}>
         <Plastic color="#08090b" />
       </Bx>
@@ -718,7 +719,7 @@ function GpuModel({ gpu, l, rgb }: { gpu: Gpu; l: L; rgb: string }) {
   )
 }
 
-// ───────────────────────────── Lagring ─────────────────────────────
+// ───────────────────────────── Storage ─────────────────────────────
 
 function SsdModel({ ssd, l }: { ssd: Storage; l: L }) {
   const tex = textTexture(512, 144, [
@@ -750,7 +751,7 @@ function SsdModel({ ssd, l }: { ssd: Storage; l: L }) {
   )
 }
 
-// ───────────────────────────── Strømforsyning ─────────────────────────────
+// ───────────────────────────── Power supply ─────────────────────────────
 
 function PsuModel({ psu, l }: { psu: Psu; l: L }) {
   const len = psu.length
@@ -792,7 +793,7 @@ function PsuModel({ psu, l }: { psu: Psu; l: L }) {
         <Rotor r={56} blades={9} color="#1d1f23" depth={12} speed={0.6} />
       </group>
       <Label tex={tex} size={[Math.min(110, len - 20), Math.min(55, (len - 20) / 2)]} position={[len / 2, 42, 150.3]} />
-      {/* Bakside: gitter, strøminntak og bryter */}
+      {/* Back: grille, power inlet and switch */}
       <MeshPanel size={[96, 70]} color="#2a2d32" position={[-0.4, 44, 92]} rotation={[0, -HALF, 0]} />
       <Bx at={[-1.2, 22, 12]} size={[1.4, 22, 28]}>
         <Plastic color="#050607" />
@@ -800,7 +801,7 @@ function PsuModel({ psu, l }: { psu: Psu; l: L }) {
       <Bx at={[-1.6, 54, 16]} size={[1.8, 14, 20]}>
         <Plastic color="#b3261e" />
       </Bx>
-      {/* Kontakter til de avtakbare kablene */}
+      {/* Connectors for the detachable cables */}
       {Array.from({ length: 10 }, (_, i) => (
         <Bx key={i} at={[len - 0.4, 14 + Math.floor(i / 5) * 30, 14 + (i % 5) * 26]} size={[1.4, 16, 18]}>
           <Plastic color="#050607" />
@@ -818,34 +819,48 @@ export function DesktopModel({ build }: { build: Build }) {
   const p = useMemo(() => getParts(build), [build])
   const { cpu, gpu, ram, storage, motherboard: mb, cooler, psu } = p
   const cs = p.case
-  if (!cs || !mb || !cpu || !gpu || !ram || !storage || !cooler || !psu) return null
+  if (!cs) return null
   const l = layout(cs, mb)
   return (
     <group scale={0.01} position={[-l.D / 200, 0.18, -l.W / 200]}>
       <CaseModel cs={cs} l={l} rgb={rgb} glass={glass} />
       <pointLight color={cs.style === 'slats' ? '#fff3e0' : rgb} intensity={2.6} distance={7} decay={1.6} position={[l.D * 0.55, l.H * 0.62, l.W * 0.8]} />
       <pointLight color="#ffffff" intensity={1.4} distance={6} decay={1.6} position={[l.D * 0.3, l.H * 0.9, l.W * 0.6]} />
-      <Part slot="motherboard" explode={[0, 0, 45]} flash={mb.id} order={1}>
-        <MotherboardModel mb={mb} l={l} rgb={rgb} />
-      </Part>
-      <Part slot="psu" explode={[-270, 0, 0]} flash={psu.id} order={2}>
-        <PsuModel psu={psu} l={l} />
-      </Part>
-      <Part slot="cpu" explode={[0, 0, 110]} flash={cpu.id} order={3}>
-        <CpuModel cpu={cpu} l={l} />
-      </Part>
-      <Part slot="storage" explode={[0, 0, 85]} flash={storage.id} order={4}>
-        <SsdModel ssd={storage} l={l} />
-      </Part>
-      <Part slot="ram" explode={[0, 0, 150]} flash={ram.id} order={5}>
-        <RamModel ram={ram} l={l} rgb={rgb} />
-      </Part>
-      <Part slot="cooler" explode={[0, 0, 255]} flash={cooler.id} order={6} liftFor={['cpu']}>
-        <CoolerModel cooler={cooler} cs={cs} l={l} rgb={rgb} />
-      </Part>
-      <Part slot="gpu" explode={[0, -8, 200]} flash={gpu.id} order={7}>
-        <GpuModel gpu={gpu} l={l} rgb={rgb} />
-      </Part>
+      {mb && (
+        <Part slot="motherboard" explode={[0, 0, 45]} flash={mb.id} order={1}>
+          <MotherboardModel mb={mb} l={l} rgb={rgb} />
+        </Part>
+      )}
+      {psu && (
+        <Part slot="psu" explode={[-270, 0, 0]} flash={psu.id} order={2}>
+          <PsuModel psu={psu} l={l} />
+        </Part>
+      )}
+      {cpu && (
+        <Part slot="cpu" explode={[0, 0, 110]} flash={cpu.id} order={3}>
+          <CpuModel cpu={cpu} l={l} />
+        </Part>
+      )}
+      {storage && (
+        <Part slot="storage" explode={[0, 0, 85]} flash={storage.id} order={4}>
+          <SsdModel ssd={storage} l={l} />
+        </Part>
+      )}
+      {ram && (
+        <Part slot="ram" explode={[0, 0, 150]} flash={ram.id} order={5}>
+          <RamModel ram={ram} l={l} rgb={rgb} />
+        </Part>
+      )}
+      {cooler && (
+        <Part slot="cooler" explode={[0, 0, 255]} flash={cooler.id} order={6} liftFor={['cpu']}>
+          <CoolerModel cooler={cooler} cs={cs} l={l} rgb={rgb} />
+        </Part>
+      )}
+      {gpu && (
+        <Part slot="gpu" explode={[0, -8, 200]} flash={gpu.id} order={7}>
+          <GpuModel gpu={gpu} l={l} rgb={rgb} />
+        </Part>
+      )}
     </group>
   )
 }

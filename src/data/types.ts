@@ -18,12 +18,12 @@ export type Profile = 'esport' | 'aaa' | 'rt'
 
 interface Base {
   id: string
-  /** Fullt produktnavn */
+  /** Full product name */
   name: string
-  /** Kort navn til lister */
+  /** Short name for lists */
   short: string
   brand: string
-  /** Omtrentlig pris i NOK. For bærbare: tillegg i forhold til grunnmodellen. */
+  /** Approximate price in NOK. For laptops: add-on relative to the base model. */
   price: number
 }
 
@@ -37,13 +37,13 @@ export interface Cpu extends Base {
   boost: number
   l3: number
   tdp: number
-  /** Høyeste effekt under full last (W) */
+  /** Highest power draw under full load (W) */
   peak: number
-  /** Typisk effekt under spilling (W) */
+  /** Typical power draw while gaming (W) */
   gamingPower: number
-  /** Spillytelse, Ryzen 7 9800X3D = 100 */
+  /** Gaming performance, Ryzen 7 9800X3D = 100 */
   gaming: number
-  /** Flerkjerneytelse, omtrent Cinebench 2024 / 16 */
+  /** Multi-core performance, roughly Cinebench 2024 / 16 */
   multi: number
   igpu: string | null
   x3d: boolean
@@ -57,9 +57,9 @@ export interface Gpu extends Base {
   kind: 'gpu'
   maker: 'NVIDIA' | 'AMD' | 'Intel'
   vram: number
-  /** Snitt-FPS i tunge spill på høyeste innstillinger, uten oppskalering */
+  /** Average FPS in demanding games at highest settings, without upscaling */
   fps: Record<Res, number>
-  /** Hvor mye av ytelsen som er igjen med ray tracing på */
+  /** How much of the performance remains with ray tracing on */
   rt: number
   power: number
   recPsu: number
@@ -97,8 +97,8 @@ export interface Ram extends Base {
   cl: number
   rgb: boolean
   color: 'black' | 'white' | 'silver'
-  /** Bærbar: SO-DIMM-brikker eller loddet minne */
-  form?: 'DIMM' | 'SO-DIMM' | 'Loddet'
+  /** Laptop: SO-DIMM sticks or soldered memory */
+  form?: 'DIMM' | 'SO-DIMM' | 'Soldered'
 }
 
 export interface Storage extends Base {
@@ -123,7 +123,7 @@ export interface Psu extends Base {
 export interface Cooler extends Base {
   kind: 'cooler'
   type: 'stock' | 'single' | 'dual' | 'aio'
-  /** Hvor mye varme (W) kjøleren håndterer komfortabelt */
+  /** How much heat (W) the cooler handles comfortably */
   capacity: number
   height: number
   radiator: 0 | 240 | 360
@@ -138,7 +138,7 @@ export interface Case extends Base {
   dims: { w: number; h: number; d: number }
   gpuMax: number
   coolerMax: number
-  /** Største radiator i toppen (mm), 0 = ingen */
+  /** Largest radiator at the top (mm), 0 = none */
   radTop: number
   frontFans: number
   fanSize: number
@@ -165,7 +165,7 @@ export interface Battery extends Base {
   charger: number
 }
 
-/** Faste deler på bærbare som bare har en forklaring og en spec-liste */
+/** Fixed parts on laptops that only have an explanation and a spec list */
 export interface Info extends Base {
   kind: 'info'
   rows: [label: string, value: string, hint?: string][]
@@ -216,12 +216,12 @@ export interface DeviceDef {
   description: string
   slots: SlotId[]
   build: Build
-  /** Bærbar: hvilke alternativer som finnes per plass. Mangler plassen, er delen fast. */
+  /** Laptop: which options exist per slot. If the slot is missing, the part is fixed. */
   options?: Partial<Record<SlotId, string[]>>
-  /** Bærbar: hvorfor en del er fast, eller når den må velges */
+  /** Laptop: why a part is fixed, or when it must be chosen */
   fixed?: Partial<Record<SlotId, string>>
   basePrice?: number
-  /** Bærbar: hvor mye av skjermkortets fulle effekt chassiset slipper til */
+  /** Laptop: how much of the graphics card's full power the chassis allows */
   gpuFactor?: number
   geom?: LaptopGeom
   goal: Goal

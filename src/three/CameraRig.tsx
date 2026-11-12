@@ -8,7 +8,7 @@ import { deviceBox, slotBox } from './Part'
 
 type Dir = [number, number, number]
 
-/** Hvilken side hver del ser best ut fra */
+/** Which side each part looks best from */
 const DESKTOP_VIEW: Partial<Record<SlotId, Dir>> = {
   motherboard: [0.16, 0.12, 1],
   cpu: [0.28, 0.3, 1],
@@ -28,7 +28,7 @@ const HOME: Record<'desktop' | 'laptop', Dir> = {
   desktop: [0.62, 0.3, 0.74],
   laptop: [0.48, 0.52, 0.74],
 }
-/** I sprengskissen ses lagene best litt mer fra siden */
+/** In the exploded view the layers are best seen from a bit more to the side */
 const HOME_EXPLODED: Record<'desktop' | 'laptop', Dir> = {
   desktop: [0.88, 0.3, 0.46],
   laptop: [0.6, 0.24, 0.76],
@@ -41,7 +41,7 @@ interface Insets {
   b: number
 }
 
-/** Hvor mye av skjermen panelene dekker langs hver kant */
+/** How much of the screen the panels cover along each edge */
 function readInsets(): Insets {
   const W = window.innerWidth
   const H = window.innerHeight
@@ -126,7 +126,7 @@ export function CameraRig() {
       }
       box.getCenter(_center)
       box.getSize(_size)
-      // Små deler vises med litt av omgivelsene rundt seg
+      // Small parts are shown with a bit of their surroundings
       const radius = Math.max(0.42, _size.length() / 2)
 
       const ins = (insets.current = readInsets())
@@ -151,11 +151,11 @@ export function CameraRig() {
       _pos.set(dir[0], dir[1], dir[2]).normalize().multiplyScalar(dist).add(_center)
 
       c.smoothTime = s.selected ? 0.5 : 0.6
-      // Første gang settes kameraet rett på plass, så maskinen er riktig innrammet fra første bilde
+      // The first time, the camera is placed right away, so the machine is correctly framed from the first frame
       void c.setLookAt(_pos.x, _pos.y, _pos.z, _center.x, _center.y, _center.z, placed.current)
       placed.current = true
     }
-    // To bilder ventetid, så nye deler rekker å bli tegnet før de måles
+    // Wait two frames, so new parts have time to be drawn before they are measured
     raf = requestAnimationFrame(() => (raf = requestAnimationFrame(run)))
     return () => cancelAnimationFrame(raf)
   }, [key, sig]) // eslint-disable-line
@@ -165,17 +165,17 @@ export function CameraRig() {
     const sh = shift.current
     if (sh.frame++ % 8 === 0) insets.current = readInsets()
     const ins = insets.current
-    // Flytter bildets midtpunkt til midten av den ledige flaten mellom panelene
+    // Moves the center of the image to the middle of the free space between the panels
     sh.x = THREE.MathUtils.damp(sh.x, (ins.r - ins.l) / 2, 5, dt)
     sh.y = THREE.MathUtils.damp(sh.y, (ins.b - ins.t) / 2, 5, dt)
     camera.setViewOffset(size.width, size.height, sh.x, sh.y, size.width, size.height)
 
-    // Lykt som følger kameraet, så delen du ser på alltid er opplyst
+    // Light that follows the camera, so the part you are looking at is always lit
     head.current?.position.copy(camera.position)
 
     const c = controls.current
     if (!c) return
-    // Du kan se oppunder høye deler, men aldri havne under gulvet
+    // You can look up under tall parts, but never end up below the floor
     c.getTarget(_tgt)
     c.maxPolarAngle = Math.PI / 2 + Math.asin(THREE.MathUtils.clamp((_tgt.y - 0.3) / c.distance, 0, 0.8))
     const s = useStore.getState()

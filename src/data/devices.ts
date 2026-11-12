@@ -5,12 +5,23 @@ const LAPTOP_SLOTS: SlotId[] = ['cpu', 'gpu', 'ram', 'storage', 'display', 'moth
 
 export const devices: DeviceDef[] = [
   {
+    id: 'empty',
+    kind: 'desktop',
+    name: 'Empty case',
+    tagline: 'Start from nothing and add every part yourself',
+    description:
+      'Just the case. Open it and pick each part one by one, and watch the machine take shape. Or choose one of the finished builds below as a starting point.',
+    slots: DESKTOP_SLOTS,
+    build: { case: 'case-north' },
+    goal: { res: 1440, profile: 'aaa', target: 60, upscale: false },
+  },
+  {
     id: 'budget',
     kind: 'desktop',
-    name: 'Budsjettbygget',
-    tagline: 'Rimelig vei inn i 1080p-spilling',
+    name: 'Budget build',
+    tagline: 'An affordable way into 1080p gaming',
     description:
-      'Seks kjerner, et skjermkort for 1080p og et kompakt kabinett. Et godt utgangspunkt som er lett å oppgradere senere, fordi AM5-sokkelen støttes i flere år til.',
+      'Six cores, a graphics card for 1080p and a compact case. A good starting point that is easy to upgrade later, because the AM5 socket is supported for several more years.',
     slots: DESKTOP_SLOTS,
     build: {
       cpu: 'r5-7600', gpu: 'rtx5060', ram: 'ram-d5-16', storage: 'ssd-nv3-1',
@@ -21,10 +32,10 @@ export const devices: DeviceDef[] = [
   {
     id: 'mid',
     kind: 'desktop',
-    name: 'Mellomklassen',
-    tagline: 'Høye innstillinger i 1440p',
+    name: 'Mid-range',
+    tagline: 'High settings at 1440p',
     description:
-      'Bygget de fleste entusiaster ender på. Skjermkortet får mesteparten av budsjettet, og resten er valgt for å ikke holde det igjen.',
+      'The build most enthusiasts end up with. The graphics card gets most of the budget, and the rest is chosen so it does not hold the card back.',
     slots: DESKTOP_SLOTS,
     build: {
       cpu: 'r7-9700x', gpu: 'rx9070xt', ram: 'ram-d5-32', storage: 'ssd-sn7100-1',
@@ -35,10 +46,10 @@ export const devices: DeviceDef[] = [
   {
     id: 'enthusiast',
     kind: 'desktop',
-    name: 'Entusiasten',
-    tagline: '4K og høy bildefrekvens uten kompromisser',
+    name: 'Enthusiast',
+    tagline: '4K and high frame rates without compromises',
     description:
-      'Markedets raskeste spillprosessor, et skjermkort for 4K og vannkjøling. Her betaler du mye for de siste prosentene.',
+      'The fastest gaming processor on the market, a graphics card for 4K and liquid cooling. Here you pay a lot for the last few percent.',
     slots: DESKTOP_SLOTS,
     build: {
       cpu: 'r7-9850x3d', gpu: 'rtx5080', ram: 'ram-d5-32rgb', storage: 'ssd-9100pro-2',
@@ -50,9 +61,9 @@ export const devices: DeviceDef[] = [
     id: 'loq15',
     kind: 'laptop',
     name: 'Lenovo LOQ 15',
-    tagline: 'Rimelig spillbærbar',
+    tagline: 'Affordable gaming laptop',
     description:
-      'En av de mest solgte spillbærbare i sin prisklasse. Plastchassis og enkel skjerm, men pengene er brukt på skjermkortet, og både minne og lagring kan byttes.',
+      'One of the best-selling gaming laptops in its price range. Plastic chassis and a simple display, but the money has gone into the graphics card, and both memory and storage can be swapped.',
     slots: LAPTOP_SLOTS,
     build: {
       cpu: 'l-r7-250', gpu: 'l-rtx5050', ram: 'l-ram-16x1', storage: 'l-ssd-512', display: 'd-loq',
@@ -63,7 +74,7 @@ export const devices: DeviceDef[] = [
       ram: ['l-ram-16x1', 'l-ram-32'],
       storage: ['l-ssd-512', 'l-ssd-1'],
     },
-    fixed: { gpu: 'Loddet på hovedkortet. Velges når du kjøper maskinen.' },
+    fixed: { gpu: 'Soldered to the motherboard. Chosen when you buy the machine.' },
     basePrice: 11990,
     gpuFactor: 1,
     geom: {
@@ -76,9 +87,9 @@ export const devices: DeviceDef[] = [
     id: 'g14',
     kind: 'laptop',
     name: 'ASUS ROG Zephyrus G14',
-    tagline: 'Tynn og lett med kraftig skjermkort',
+    tagline: 'Thin and light with a powerful graphics card',
     description:
-      'Halvannet kilo med OLED-skjerm og et skjermkort som egentlig hører hjemme i større maskiner. Kompromisset er at nesten alt er loddet fast.',
+      'Just over a kilo and a half, with an OLED display and a graphics card that really belongs in bigger machines. The compromise is that almost everything is soldered on.',
     slots: LAPTOP_SLOTS,
     build: {
       cpu: 'l-u9-386h', gpu: 'g14-rtx5070ti', ram: 'g14-ram-32', storage: 'p-ssd-1', display: 'd-g14',
@@ -89,8 +100,8 @@ export const devices: DeviceDef[] = [
       storage: ['p-ssd-1', 'p-ssd-2'],
     },
     fixed: {
-      gpu: 'Loddet på hovedkortet. Velges når du kjøper maskinen.',
-      ram: 'Minnet er loddet fast og kan ikke oppgraderes.',
+      gpu: 'Soldered to the motherboard. Chosen when you buy the machine.',
+      ram: 'The memory is soldered on and cannot be upgraded.',
     },
     basePrice: 39990,
     gpuFactor: 0.9,
@@ -104,9 +115,9 @@ export const devices: DeviceDef[] = [
     id: 'pro7i',
     kind: 'laptop',
     name: 'Lenovo Legion Pro 7i',
-    tagline: 'Stasjonær ytelse i bærbar form',
+    tagline: 'Desktop performance in laptop form',
     description:
-      'Seksten tommer, 24 kjerner og et skjermkort med full effekt. Tykk og tung nok til å kjøle det ordentlig – en erstatning for stasjonær PC som kan flyttes.',
+      'Sixteen inches, 24 cores and a graphics card at full power. Thick and heavy enough to cool it properly – a portable replacement for a desktop PC.',
     slots: LAPTOP_SLOTS,
     build: {
       cpu: 'l-u9-290hx', gpu: 'l-rtx5080', ram: 'pro-ram-32', storage: 'p-ssd-1', display: 'd-pro7',
@@ -117,7 +128,7 @@ export const devices: DeviceDef[] = [
       ram: ['pro-ram-32', 'pro-ram-64'],
       storage: ['p-ssd-1', 'p-ssd-2'],
     },
-    fixed: { gpu: 'Loddet på hovedkortet. Velges når du kjøper maskinen.' },
+    fixed: { gpu: 'Soldered to the motherboard. Chosen when you buy the machine.' },
     basePrice: 39990,
     gpuFactor: 1,
     geom: {

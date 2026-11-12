@@ -4,7 +4,7 @@ import { kr, slotText } from '../data/texts'
 import type { Res, SlotId } from '../data/types'
 import { component, evaluate } from '../logic/evaluate'
 import { useBuild, useDevice, useStore } from '../store'
-import { Logo } from './icons'
+import { Logo, ThemeButton } from './icons'
 
 const KEY_SLOTS: Record<'desktop' | 'laptop', SlotId[]> = {
   desktop: ['cpu', 'gpu', 'ram', 'storage'],
@@ -22,12 +22,15 @@ export function Picker() {
     () => Object.fromEntries(devices.map((d) => [d.id, evaluate(d, builds[d.id], d.goal).price])),
     [builds],
   )
-  // Samme målestokk for alle maskiner: tunge spill uten oppskalering
+  // Same scale for all machines: demanding games without upscaling
   const fps = useMemo(
     () => evaluate(device, build, { res: 1440, profile: 'aaa', target: 60, upscale: false }).byRes,
     [device, build],
   )
   const changed = JSON.stringify(build) !== JSON.stringify(device.build)
+  // Both side panels are shown or hidden together
+  const collapsed = !useStore((s) => s.showDossier)
+  const togglePanels = useStore((s) => s.toggleDossier)
 
   const group = (kind: 'desktop' | 'laptop', title: string) => (
     <section>
@@ -50,31 +53,51 @@ export function Picker() {
 
   return (
     <>
-      <nav className="panel picker" data-inset="auto" aria-label="Velg maskin">
+      {collapsed ? (
+        <div className="panel pickertab">
+          <button onClick={togglePanels} aria-label="Show panels">
+            <span className="chev">›</span>
+            <span>Machines</span>
+          </button>
+          <ThemeButton />
+        </div>
+      ) : (
+      <nav className="panel picker" data-inset="auto" aria-label="Choose machine">
+        <div className="corner">
+          <ThemeButton />
+          <button className="iconbtn" onClick={togglePanels} aria-label="Hide panels" title="Hide panels">
+            ‹
+          </button>
+        </div>
         <header className="brand">
           <Logo />
-          <h1>Maskinrommet</h1>
-          <p>Åpne en PC, se hva hver del gjør, og bytt deler til bygget passer deg.</p>
+          <h1>The Machine Room</h1>
+          <p>Open a PC, see what each part does, and swap parts until the build suits you.</p>
         </header>
-        {group('desktop', 'Stasjonære')}
-        {group('laptop', 'Bærbare')}
+        {group('desktop', 'Desktops')}
+        {group('laptop', 'Laptops')}
         <p className="fineprint">
-          Prisene er omtrentlige norske butikkpriser fra november 2026. Bildefrekvens er anslag til sammenligning, ikke målinger.
+          Prices are approximate Norwegian retail prices from November 2026. Frame rates are estimates for comparison, not measurements.
         </p>
       </nav>
+      )}
 
+      {!collapsed && (
       <aside className="panel dossier" data-inset="auto" key={device.id}>
+        <button className="iconbtn dossierhide" onClick={togglePanels} aria-label="Hide panels" title="Hide panels">
+          ›
+        </button>
         <h2>{device.name}</h2>
         <p className="lede">{device.description}</p>
         <dl className="keyparts">
           {KEY_SLOTS[device.kind].map((slot) => (
             <div key={slot}>
               <dt>{slotText(device.kind, slot).label}</dt>
-              <dd>{component(build, slot)?.short}</dd>
+              <dd data-empty={!component(build, slot)}>{component(build, slot)?.short ?? 'Empty'}</dd>
             </div>
           ))}
         </dl>
-        <h3>Bildefrekvens i tunge spill</h3>
+        <h3>Frame rate in demanding games</h3>
         <div className="resbars">
           {([1080, 1440, 2160] as Res[]).map((r) => (
             <div key={r} className="resbar">
@@ -82,18 +105,19 @@ export function Picker() {
               <span className="track">
                 <span className="fill" style={{ width: `${Math.min(100, (fps[r] / 200) * 100)}%` }} />
               </span>
-              <span className="v">{fps[r]}</span>
+              <span className="v">{fps[r] || '–'}</span>
             </div>
           ))}
         </div>
         <div className="total">
-          <span>{changed ? 'Pris med dine endringer' : 'Pris slik den står'}</span>
+          <span>{changed ? 'Price with your changes' : 'Price as it stands'}</span>
           <strong>{kr(prices[device.id])}</strong>
         </div>
         <button className="cta" onClick={open}>
-          Åpne maskinen
+          Open machine
         </button>
       </aside>
+      )}
     </>
   )
 }

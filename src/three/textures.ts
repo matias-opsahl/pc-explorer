@@ -4,7 +4,7 @@ export const FONT = '"Saira Condensed", "Arial Narrow", sans-serif'
 
 const cache = new Map<string, THREE.CanvasTexture>()
 
-/** Tegner en tekstur én gang og gjenbruker den */
+/** Draws a texture once and reuses it */
 export function canvasTexture(
   key: string,
   w: number,
@@ -36,7 +36,7 @@ function rng(seed: number) {
   }
 }
 
-/** Hullmønster til mesh-paneler. Brukes som alphaMap. */
+/** Hole pattern for mesh panels. Used as alphaMap. */
 export function perforated(repX: number, repY: number): THREE.CanvasTexture {
   const rx = Math.max(1, Math.round(repX))
   const ry = Math.max(1, Math.round(repY))
@@ -68,7 +68,7 @@ export function perforated(repX: number, repY: number): THREE.CanvasTexture {
   return t
 }
 
-/** Kretskort med ledningsbaner */
+/** Circuit board with traces */
 export function pcbTexture(kind: 'black' | 'green'): THREE.CanvasTexture {
   const base = kind === 'black' ? '#14161a' : '#0f3b2c'
   const trace = kind === 'black' ? '#1f2329' : '#17523d'
@@ -107,7 +107,7 @@ export function pcbTexture(kind: 'black' | 'green'): THREE.CanvasTexture {
         ctx.fill()
       }
     }
-    // Små loddepunkter i rader
+    // Small solder pads in rows
     ctx.fillStyle = pad
     for (let i = 0; i < 46; i++) {
       const x = rand() * w
@@ -124,14 +124,14 @@ export interface TextLine {
   size: number
   weight?: number
   color?: string
-  /** 0–1 av høyden, midten av linjen */
+  /** 0–1 of the height, the middle of the line */
   y: number
   x?: number
   align?: CanvasTextAlign
   spacing?: number
 }
 
-/** Tekst på gjennomsiktig bakgrunn, til merking av deler */
+/** Text on transparent background, for labeling parts */
 export function textTexture(w: number, h: number, lines: TextLine[], bg?: string): THREE.CanvasTexture {
   const key = `text:${w}:${h}:${bg ?? ''}:${JSON.stringify(lines)}`
   return canvasTexture(key, w, h, (ctx) => {
@@ -151,7 +151,7 @@ export function textTexture(w: number, h: number, lines: TextLine[], bg?: string
   })
 }
 
-/** Skjermbildet på en bærbar: et landskap med bildeteller */
+/** The screen image on a laptop: a landscape with a frame counter */
 export function screenTexture(fps: number, hz: number, aspect: number): THREE.CanvasTexture {
   const w = 1024
   const h = Math.round(w / aspect)
@@ -184,7 +184,7 @@ export function screenTexture(fps: number, hz: number, aspect: number): THREE.Ca
       ctx.closePath()
       ctx.fill()
     }
-    // Bildeteller
+    // Frame counter
     ctx.fillStyle = 'rgba(8,14,16,.72)'
     ctx.fillRect(w * 0.03, h * 0.05, w * 0.2, h * 0.14)
     ctx.fillStyle = fps >= hz ? '#8ff0b5' : '#f0c048'
@@ -194,7 +194,7 @@ export function screenTexture(fps: number, hz: number, aspect: number): THREE.Ca
     ctx.fillStyle = '#eef3ea'
     ctx.font = `600 ${Math.round(h * 0.045)}px ${FONT}`
     ctx.fillText('FPS', w * 0.165, h * 0.14)
-    // Trådkors
+    // Crosshair
     ctx.strokeStyle = 'rgba(255,255,255,.8)'
     ctx.lineWidth = 3
     ctx.beginPath()

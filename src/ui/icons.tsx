@@ -1,3 +1,4 @@
+import { useStore } from '../store'
 import type { ReactNode } from 'react'
 import type { SlotId } from '../data/types'
 import type { Level } from '../logic/evaluate'
@@ -112,5 +113,25 @@ export function Logo() {
       <rect x="15.5" y="15.5" width="9" height="9" fill="var(--pad)" />
       <path d="M14 4v5M20 4v5M26 4v5M14 31v5M20 31v5M26 31v5M4 14h5M4 20h5M4 26h5M31 14h5M31 20h5M31 26h5" stroke="var(--silk)" strokeWidth="2" strokeLinecap="round" />
     </svg>
+  )
+}
+
+export function ThemeButton() {
+  const theme = useStore((s) => s.theme)
+  const toggle = useStore((s) => s.toggleTheme)
+  const next = theme === 'dark' ? 'light' : 'dark'
+  return (
+    <button className="iconbtn" onClick={toggle} aria-label={`Switch to ${next} design`} title={`Switch to ${next} design`}>
+      {theme === 'dark' ? (
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+          <circle cx="8" cy="8" r="3" />
+          <path d="M8 1v1.5M8 13.5V15M1 8h1.5M13.5 8H15M3 3l1 1M12 12l1 1M13 3l-1 1M4 12l-1 1" />
+        </svg>
+      ) : (
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round">
+          <path d="M13.5 9.5A5.5 5.5 0 0 1 6.5 2.5a5.5 5.5 0 1 0 7 7Z" transform="translate(0.5 -0.5)" />
+        </svg>
+      )}
+    </button>
   )
 }

@@ -31,9 +31,9 @@ export interface Issue {
 
 export interface Perf {
   fps: number
-  /** Taket prosessoren setter */
+  /** The ceiling the processor sets */
   cpuCap: number
-  /** Det skjermkortet klarer alene */
+  /** What the graphics card can manage on its own */
   gpuFps: number
   limiter: 'cpu' | 'gpu' | 'balanced'
   vramShort: boolean
@@ -73,7 +73,7 @@ export function getParts(build: Build): Parts {
   for (const slot of Object.keys(build) as SlotId[]) {
     const c = component(build, slot)
     if (!c || c.kind === 'info') continue
-    // Plassen og delens type har samme navn for alle typer vi regner på
+    // The slot and the part's type have the same name for all types we calculate with
     ;(p as Record<string, Component>)[c.kind] = c
   }
   return p
@@ -86,7 +86,7 @@ export function optionsFor(device: DeviceDef, slot: SlotId): Component[] {
   return (device.options?.[slot] ?? []).map((id) => catalog[id])
 }
 
-// ───────────────────────────── Ytelse ─────────────────────────────
+// ───────────────────────────── Performance ─────────────────────────────
 
 const CPU_SCALE = { esport: 6, aaa: 2.3, rt: 1.9 }
 const GPU_SCALE = { esport: 3.4, aaa: 1, rt: 1 }
@@ -101,7 +101,7 @@ function ramFactor(ram: Ram | undefined, profile: Goal['profile']): number {
   if (!ram) return 1
   let f = 1
   if (ram.sticks === 1) f *= 0.87
-  if (ram.type === 'DDR5' && ram.form !== 'Loddet') {
+  if (ram.type === 'DDR5' && ram.form !== 'Soldered') {
     if (ram.speed < 5600) f *= 0.95
     else if (ram.speed < 6000) f *= 0.98
     else if (ram.cl > 32) f *= 0.99
@@ -119,7 +119,7 @@ export function estimate(p: Parts, goal: Goal, gpuFactor = 1): Perf {
   if (!cpu || !gpu) return { fps: 0, cpuCap: 0, gpuFps: 0, limiter: 'balanced', vramShort: false }
 
   let cpuCap = cpu.gaming * CPU_SCALE[goal.profile] * ramFactor(ram, goal.profile)
-  // For svak kjøler: prosessoren struper seg selv
+  // Cooler too weak: the processor slows itself down
   if (cooler && cooler.capacity < cpu.tdp) cpuCap *= 0.9
 
   let gpuFps = gpu.fps[goal.res] * GPU_SCALE[goal.profile] * gpuFactor
@@ -136,7 +136,7 @@ export function estimate(p: Parts, goal: Goal, gpuFactor = 1): Perf {
   return { fps: Math.round(fps), cpuCap: Math.round(cpuCap), gpuFps: Math.round(gpuFps), limiter, vramShort }
 }
 
-// ───────────────────────────── Strøm ─────────────────────────────
+// ───────────────────────────── Power ─────────────────────────────
 
 function powerOf(p: Parts) {
   const cpu = p.cpu?.peak ?? 0
@@ -149,7 +149,7 @@ function powerOf(p: Parts) {
   }
 }
 
-// ───────────────────────────── Kompatibilitet ─────────────────────────────
+// ───────────────────────────── Compatibility ─────────────────────────────
 
 function desktopIssues(p: Parts, goal: Goal, perf: Perf, power: Evaluation['power']): Issue[] {
   const out: Issue[] = []
@@ -159,94 +159,94 @@ function desktopIssues(p: Parts, goal: Goal, perf: Perf, power: Evaluation['powe
     out.push({ id, level, slots, title, detail })
 
   if (cpu && mb && cpu.socket !== mb.socket) {
-    add('error', 'socket', ['cpu', 'motherboard'], 'Prosessoren passer ikke i hovedkortet',
-      `${cpu.short} bruker sokkel ${cpu.socket}, mens hovedkortet har ${mb.socket}. Pinnene sitter ulikt, så brikken går ikke ned i sokkelen. Bytt én av delene.`)
+    add('error', 'socket', ['cpu', 'motherboard'], 'The processor does not fit the motherboard',
+      `${cpu.short} uses socket ${cpu.socket}, while the motherboard has ${mb.socket}. The pins are arranged differently, so the chip will not sit in the socket. Change one of the parts.`)
   }
   if (ram && mb && ram.type !== mb.ramType) {
-    add('error', 'ramtype', ['ram', 'motherboard'], 'Minnet passer ikke i hovedkortet',
-      `Hovedkortet har spor for ${mb.ramType}, men minnet er ${ram.type}. Hakket i brikken sitter på et annet sted, så den lar seg ikke trykke ned.`)
+    add('error', 'ramtype', ['ram', 'motherboard'], 'The memory does not fit the motherboard',
+      `The motherboard has slots for ${mb.ramType}, but the memory is ${ram.type}. The notch on the stick is in a different place, so it will not press in.`)
   }
   if (ram && mb && ram.sticks > mb.ramSlots) {
-    add('error', 'ramslots', ['ram', 'motherboard'], 'For mange minnebrikker',
-      `Settet har ${ram.sticks} brikker, men hovedkortet har bare ${mb.ramSlots} spor.`)
+    add('error', 'ramslots', ['ram', 'motherboard'], 'Too many memory sticks',
+      `The kit has ${ram.sticks} sticks, but the motherboard only has ${mb.ramSlots} slots.`)
   }
   if (mb && cs && !cs.forms.includes(mb.form)) {
-    add('error', 'form', ['motherboard', 'case'], 'Hovedkortet er for stort for kabinettet',
-      `${cs.short.split(' (')[0]} tar bare Micro-ATX-kort (244 mm høye). Et ATX-kort er 305 mm høyt og når ned i strømforsyningsrommet.`)
+    add('error', 'form', ['motherboard', 'case'], 'The motherboard is too large for the case',
+      `${cs.short.split(' (')[0]} only takes Micro-ATX boards (244 mm tall). An ATX board is 305 mm tall and reaches down into the power supply area.`)
   }
   if (gpu && cs && gpu.length > cs.gpuMax) {
-    add('error', 'gpulen', ['gpu', 'case'], 'Skjermkortet er for langt',
-      `${gpu.short} er ${gpu.length} mm langt, men kabinettet har plass til ${cs.gpuMax} mm før kortet treffer frontviftene.`)
+    add('error', 'gpulen', ['gpu', 'case'], 'The graphics card is too long',
+      `${gpu.short} is ${gpu.length} mm long, but the case has room for ${cs.gpuMax} mm before the card hits the front fans.`)
   }
   if (cooler && cs) {
     if (cooler.type !== 'aio' && cooler.height > cs.coolerMax) {
-      add('error', 'coolerh', ['cooler', 'case'], 'Kjøleren er for høy',
-        `${cooler.short} er ${cooler.height} mm høy, men det er bare ${cs.coolerMax} mm fra prosessoren til sidepanelet. Panelet får du ikke på.`)
+      add('error', 'coolerh', ['cooler', 'case'], 'The cooler is too tall',
+        `${cooler.short} is ${cooler.height} mm tall, but there are only ${cs.coolerMax} mm from the processor to the side panel. The side panel will not fit on.`)
     }
     if (cooler.type === 'aio' && cooler.radiator > cs.radTop) {
-      add('error', 'rad', ['cooler', 'case'], 'Radiatoren får ikke plass',
+      add('error', 'rad', ['cooler', 'case'], 'The radiator does not fit',
         cs.radTop
-          ? `Kabinettet har plass til en radiator på opptil ${cs.radTop} mm i toppen. Denne er ${cooler.radiator} mm.`
-          : 'Kabinettet har ikke plass til radiator i toppen.')
+          ? `The case has room for a radiator of up to ${cs.radTop} mm at the top. This one is ${cooler.radiator} mm.`
+          : 'The case has no room for a radiator at the top.')
     }
   }
   if (cooler && cpu) {
     if (!cooler.sockets.includes(cpu.socket)) {
-      add('error', 'coolersocket', ['cooler', 'cpu'], 'Kjøleren passer ikke sokkelen',
-        `${cooler.short} har bare feste for ${cooler.sockets.join(' og ')}.`)
+      add('error', 'coolersocket', ['cooler', 'cpu'], 'The cooler does not fit the socket',
+        `${cooler.short} only has mounting for ${cooler.sockets.join(' and ')}.`)
     } else if (cooler.type === 'stock' && !cpu.coolerIncluded) {
-      add('error', 'stock', ['cooler', 'cpu'], 'Denne kjøleren følger ikke med',
-        `Wraith Stealth ligger bare i esken til Ryzen 5 5600 og 7600. ${cpu.short} selges uten kjøler, så du må velge en selv.`)
+      add('error', 'stock', ['cooler', 'cpu'], 'This cooler is not included',
+        `The Wraith Stealth only comes in the box with the Ryzen 5 5600 and 7600. ${cpu.short} is sold without a cooler, so you have to choose one yourself.`)
     } else if (cooler.capacity < cpu.tdp) {
-      add('warning', 'coolweak', ['cooler', 'cpu'], 'Kjøleren er for svak',
-        `${cpu.short} avgir ${cpu.tdp} W varme, men kjøleren håndterer rundt ${cooler.capacity} W. Prosessoren vil bremse seg selv for ikke å bli for varm.`)
+      add('warning', 'coolweak', ['cooler', 'cpu'], 'The cooler is too weak',
+        `${cpu.short} gives off ${cpu.tdp} W of heat, but the cooler handles around ${cooler.capacity} W. The processor will slow itself down to avoid overheating.`)
     } else if (cooler.capacity < cpu.peak) {
-      add('tip', 'coolwarm', ['cooler', 'cpu'], 'Kjøleren jobber hardt under full last',
-        `Under tung last kan ${cpu.short} trekke opptil ${cpu.peak} W. Kjøleren klarer det, men viften vil gå fort og høres. I spill er belastningen lavere.`)
+      add('tip', 'coolwarm', ['cooler', 'cpu'], 'The cooler works hard under full load',
+        `Under heavy load ${cpu.short} can draw up to ${cpu.peak} W. The cooler can handle it, but the fan will run fast and be audible. In games the load is lower.`)
     }
   }
   if (psu && gpu && cpu) {
     if (power.peak > psu.watt) {
-      add('error', 'psuw', ['psu', 'gpu'], 'Strømforsyningen er for liten',
-        `Delene kan trekke rundt ${power.peak} W samtidig, men strømforsyningen leverer ${psu.watt} W. Maskinen vil slå seg av under last.`)
+      add('error', 'psuw', ['psu', 'gpu'], 'The power supply is too small',
+        `The parts can draw around ${power.peak} W at the same time, but the power supply delivers ${psu.watt} W. The machine will shut down under load.`)
     } else if (psu.watt < gpu.recPsu) {
-      add('warning', 'psurec', ['psu', 'gpu'], 'Liten margin på strømforsyningen',
-        `${gpu.brand} anbefaler minst ${gpu.recPsu} W for ${gpu.short}. Skjermkort har korte effekttopper langt over snittet, og med ${psu.watt} W kan maskinen kutte ut i tunge scener.`)
+      add('warning', 'psurec', ['psu', 'gpu'], 'Little margin on the power supply',
+        `${gpu.brand} recommends at least ${gpu.recPsu} W for the ${gpu.short}. Graphics cards have short power spikes far above the average, and with ${psu.watt} W the machine can cut out in demanding scenes.`)
     } else if (power.peak > psu.watt * 0.85) {
-      add('warning', 'psuhead', ['psu'], 'Liten margin på strømforsyningen',
-        `Delene kan trekke rundt ${power.peak} W av ${psu.watt} W. Det virker, men gir lite rom for effekttopper og senere oppgraderinger.`)
+      add('warning', 'psuhead', ['psu'], 'Little margin on the power supply',
+        `The parts can draw around ${power.peak} W of ${psu.watt} W. It works, but leaves little room for power spikes and later upgrades.`)
     }
     if (gpu.connector === '12V-2x6' && !psu.atx3) {
-      add('tip', 'adapter', ['psu', 'gpu'], 'Skjermkortet trenger en adapter',
-        `${gpu.short} bruker den nye 12V-2x6-kontakten. Denne strømforsyningen har den ikke, så du må bruke adapteren som følger med kortet.`)
+      add('tip', 'adapter', ['psu', 'gpu'], 'The graphics card needs an adapter',
+        `The ${gpu.short} uses the new 12V-2x6 connector. This power supply does not have it, so you need to use the adapter that comes with the card.`)
     }
   }
   if (ram) {
     if (ram.sticks === 1) {
-      add('warning', 'single', ['ram'], 'Bare én minnebrikke',
-        'Med én brikke kjører minnet i single channel, og prosessoren får halv båndbredde. To brikker gir typisk 10–20 % høyere bildefrekvens.')
+      add('warning', 'single', ['ram'], 'Only one memory stick',
+        'With one stick the memory runs in single channel, and the processor gets half the bandwidth. Two sticks typically give 10–20% higher frame rates.')
     }
     const total = ram.sticks * ram.perStick
     if (total < 32 && goal.profile !== 'esport' && ram.sticks > 1) {
-      add('tip', 'ram16', ['ram'], '16 GB er i minste laget',
-        'Nye storspill bruker ofte 12–16 GB alene. Med nettleser og Discord i bakgrunnen kan det bli trangt, og da hakker spillet.')
+      add('tip', 'ram16', ['ram'], '16 GB is on the minimum side',
+        'New demanding games often use 12–16 GB on their own. With a browser and Discord running in the background it can get tight, and then the game stutters.')
     }
     if (ram.type === 'DDR5' && ram.speed > 5600 && mb && ram.type === mb.ramType) {
-      add('tip', 'expo', ['ram'], `Husk å slå på ${mb.socket === 'LGA1851' ? 'XMP' : 'EXPO'} i BIOS`,
-        `Minnet kjører bare ${mb.socket === 'LGA1851' ? '5600' : '5200'} MHz rett ut av esken. Profilen på ${ram.speed} MHz må slås på med ett valg i BIOS.`)
+      add('tip', 'expo', ['ram'], `Remember to enable ${mb.socket === 'LGA1851' ? 'XMP' : 'EXPO'} in the BIOS`,
+        `The memory only runs at ${mb.socket === 'LGA1851' ? '5600' : '5200'} MHz straight out of the box. The ${ram.speed} MHz profile must be enabled with one setting in the BIOS.`)
     }
   }
   if (cpu && mb && cpu.socket === mb.socket && cpu.year > mb.year) {
-    add('tip', 'bios', ['motherboard', 'cpu'], 'Hovedkortet kan trenge BIOS-oppdatering',
-      `${mb.chipset}-kortet kom før ${cpu.short}. Ligger det en gammel BIOS på kortet, starter ikke maskinen før den er oppdatert. De fleste kort kan oppdateres fra minnepinne uten prosessor.`)
+    add('tip', 'bios', ['motherboard', 'cpu'], 'The motherboard may need a BIOS update',
+      `The ${mb.chipset} board came out before ${cpu.short}. If the board has an old BIOS, the machine will not start until it is updated. Most boards can be updated from a USB stick without a processor installed.`)
   }
   if (cpu && mb && cpu.socket === mb.socket && cpu.brand === 'Intel' && !mb.overclock) {
-    add('tip', 'kboard', ['motherboard', 'cpu'], 'Overklokking krever Z-brikkesett',
-      `${cpu.short} kan overklokkes, men ${mb.chipset}-kort støtter det ikke. Uten betydning hvis du ikke hadde tenkt å overklokke.`)
+    add('tip', 'kboard', ['motherboard', 'cpu'], 'Overclocking requires a Z-series chipset',
+      `${cpu.short} can be overclocked, but ${mb.chipset} boards do not support it. Irrelevant if you do not plan to overclock.`)
   }
   if (storage && mb && storage.iface === 'PCIe 5.0' && !mb.pcie5M2) {
-    add('tip', 'pcie5', ['storage', 'motherboard'], 'SSD-en får ikke brukt full hastighet',
-      `Hovedkortet har bare PCIe 4.0 til M.2. SSD-en virker, men stopper på rundt 7 000 MB/s i stedet for ${storage.read.toLocaleString('nb-NO')} MB/s.`)
+    add('tip', 'pcie5', ['storage', 'motherboard'], 'The SSD cannot reach full speed',
+      `The motherboard only has PCIe 4.0 to M.2. The SSD works, but stops at around 7,000 MB/s instead of ${storage.read.toLocaleString('en-US')} MB/s.`)
   }
   performanceIssues(out, p, goal, perf)
   return out
@@ -257,14 +257,14 @@ function performanceIssues(out: Issue[], p: Parts, goal: Goal, perf: Perf) {
   if (!cpu || !gpu) return
   if (perf.vramShort) {
     out.push({
-      id: 'vram', level: 'warning', slots: ['gpu'], title: 'Lite skjermkortminne for dette målet',
-      detail: `${gpu.vram} GB VRAM er knapt for ${RES_LABEL[goal.res]} på høyeste innstillinger. Når minnet går fullt, hakker bildet. Skru ned teksturkvaliteten eller velg et kort med mer minne.`,
+      id: 'vram', level: 'warning', slots: ['gpu'], title: 'Limited graphics card memory for this target',
+      detail: `${gpu.vram} GB VRAM is barely enough for ${RES_LABEL[goal.res]} at the highest settings. When the memory fills up, the image stutters. Lower the texture quality or choose a card with more memory.`,
     })
   }
   if (perf.limiter === 'cpu' && perf.gpuFps / perf.cpuCap > 1.35 && perf.fps < goal.target * 1.5) {
     out.push({
-      id: 'bottleneck', level: 'warning', slots: ['cpu', 'gpu'], title: 'Prosessoren holder igjen skjermkortet',
-      detail: `Skjermkortet kunne levert rundt ${perf.gpuFps} FPS her, men ${cpu.short} rekker bare å forberede rundt ${perf.cpuCap}. En raskere prosessor gir mer enn et dyrere skjermkort.`,
+      id: 'bottleneck', level: 'warning', slots: ['cpu', 'gpu'], title: 'The processor is holding back the graphics card',
+      detail: `The graphics card could deliver around ${perf.gpuFps} FPS here, but ${cpu.short} can only prepare around ${perf.cpuCap}. A faster processor gives more than a more expensive graphics card.`,
     })
   }
 }
@@ -274,33 +274,33 @@ function laptopIssues(device: DeviceDef, p: Parts, goal: Goal, perf: Perf): Issu
   const { ram, display, gpu } = p
   if (ram?.sticks === 1) {
     out.push({
-      id: 'single', level: 'warning', slots: ['ram'], title: 'Bare én minnebrikke',
-      detail: 'Maskinen selges med én brikke på 16 GB, så minnet kjører i single channel. Det ledige sporet kan fylles med en brikke til – den billigste oppgraderingen du kan gjøre.',
+      id: 'single', level: 'warning', slots: ['ram'], title: 'Only one memory stick',
+      detail: 'The machine is sold with one 16 GB stick, so the memory runs in single channel. The free slot can be filled with a second stick – the cheapest upgrade you can make.',
     })
   }
   if (display && goal.res > display.native) {
     out.push({
-      id: 'res', level: 'tip', slots: ['display'], title: 'Målet er høyere enn skjermens oppløsning',
-      detail: `Den innebygde skjermen har ${display.res[0]} × ${display.res[1]} piksler. ${RES_LABEL[goal.res]} gir bare mening på en ekstern skjerm.`,
+      id: 'res', level: 'tip', slots: ['display'], title: 'The target is higher than the display resolution',
+      detail: `The built-in display has ${display.res[0]} × ${display.res[1]} pixels. ${RES_LABEL[goal.res]} only makes sense on an external display.`,
     })
   }
   if (display && perf.fps > display.hz * 1.25) {
     out.push({
-      id: 'hz', level: 'tip', slots: ['display'], title: 'Skjermen viser ikke alle bildene',
-      detail: `Maskinen lager rundt ${perf.fps} bilder i sekundet, men skjermen viser ${display.hz}. Resten går tapt.`,
+      id: 'hz', level: 'tip', slots: ['display'], title: 'The display does not show every frame',
+      detail: `The machine produces around ${perf.fps} frames per second, but the display shows ${display.hz}. The rest is lost.`,
     })
   }
   if (gpu && (device.gpuFactor ?? 1) < 1) {
     out.push({
-      id: 'tgp', level: 'tip', slots: ['gpu', 'cooler'], title: 'Skjermkortet får ikke full effekt',
-      detail: `Det tynne chassiset klarer ikke å kjøle bort mer, så ${gpu.short} går på rundt ${gpu.power} W. I en tykkere maskin yter samme brikke omtrent 10 % bedre.`,
+      id: 'tgp', level: 'tip', slots: ['gpu', 'cooler'], title: 'The graphics card does not get full power',
+      detail: `The thin chassis cannot cool away more, so the ${gpu.short} runs at around ${gpu.power} W. In a thicker machine the same chip performs about 10% better.`,
     })
   }
   performanceIssues(out, p, goal, perf)
   return out
 }
 
-// ───────────────────────────── Samlet vurdering ─────────────────────────────
+// ───────────────────────────── Overall assessment ─────────────────────────────
 
 export function evaluate(device: DeviceDef, build: Build, goal: Goal): Evaluation {
   const parts = getParts(build)
@@ -314,7 +314,7 @@ export function evaluate(device: DeviceDef, build: Build, goal: Goal): Evaluatio
   const power = powerOf(parts)
 
   const breakdown: Evaluation['breakdown'] = []
-  if (device.basePrice) breakdown.push({ slot: 'base', label: 'Grunnmodell', price: device.basePrice })
+  if (device.basePrice) breakdown.push({ slot: 'base', label: 'Base model', price: device.basePrice })
   for (const slot of device.slots) {
     const c = component(build, slot)
     if (c && c.price > 0) breakdown.push({ slot, label: slotText(device.kind, slot).label, price: c.price })
@@ -329,7 +329,7 @@ export function evaluate(device: DeviceDef, build: Build, goal: Goal): Evaluatio
   return { price, breakdown, perf, byRes, multi: parts.cpu?.multi ?? 0, power, issues, parts }
 }
 
-/** Verste nivå blant problemene som gjelder en plass */
+/** Most severe level among the issues that concern a slot */
 export function slotLevel(issues: Issue[], slot: SlotId): Level | null {
   let worst: Level | null = null
   for (const i of issues) {
@@ -340,7 +340,7 @@ export function slotLevel(issues: Issue[], slot: SlotId): Level | null {
   return worst
 }
 
-// ───────────────────────────── Forslag ─────────────────────────────
+// ───────────────────────────── Suggestions ─────────────────────────────
 
 export interface Suggestion {
   kind: 'reach' | 'value' | 'save'

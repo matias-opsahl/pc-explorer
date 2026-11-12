@@ -1,6 +1,6 @@
 /*
- * Uttrykket er hentet fra et kretskort: loddemaske-grønne flater, hvit silketrykk-tekst
- * og gull der noe kan kobles til. Gull betyr alltid «valgt» eller «trykk her».
+ * The look is taken from a circuit board: solder-mask green surfaces, white silkscreen text
+ * and gold where something can be connected. Gold always means "selected" or "press here".
  */
 :root {
   --stage: #0c1416;
@@ -23,6 +23,53 @@
   --left-w: clamp(232px, 20vw, 288px);
   --right-w: clamp(330px, 29vw, 420px);
   --gap: 16px;
+  --well: rgb(0 0 0 / 0.2);
+  --well-strong: rgb(0 0 0 / 0.32);
+  --hover-4: rgb(255 255 255 / 0.04);
+  --hover-5: rgb(255 255 255 / 0.05);
+  --hover-7: rgb(255 255 255 / 0.07);
+  --toast-bg: #1b1512;
+  --toast-err-bg: #1f1312;
+  --shadow: rgb(0 0 0 / 0.45);
+  --tip-bg: #0b1f1c;
+  --ok-ink: #06261a;
+  --warn-ink: #2e1500;
+  --fill-ok: #8ff0b5;
+  --fill-warn: #ff9d4d;
+  color-scheme: dark;
+}
+
+/* Light: the same circuit-board idea, but silkscreen on a pale board */
+:root[data-theme='light'] {
+  --stage: #e4ebe6;
+  --panel: rgb(250 252 249 / 0.9);
+  --raise: #e2ece6;
+  --raise-2: #d5e3da;
+  --line: rgb(30 80 64 / 0.14);
+  --line-strong: rgb(30 80 64 / 0.3);
+  --silk: #10261f;
+  --silk-dim: #3f5a50;
+  --silk-faint: #5f766c;
+  --pad: #e0ac2a;
+  --pad-ink: #2b2000;
+  --ok: #17824a;
+  --warn: #c25600;
+  --err: #c8352b;
+  --tip: #1f73ad;
+  --well: rgb(20 60 45 / 0.08);
+  --well-strong: rgb(20 60 45 / 0.12);
+  --hover-4: rgb(20 60 45 / 0.05);
+  --hover-5: rgb(20 60 45 / 0.06);
+  --hover-7: rgb(20 60 45 / 0.08);
+  --toast-bg: #fff6ee;
+  --toast-err-bg: #fff0ee;
+  --shadow: rgb(20 40 30 / 0.18);
+  --tip-bg: #ffffff;
+  --ok-ink: #ffffff;
+  --warn-ink: #ffffff;
+  --fill-ok: #3fbf78;
+  --fill-warn: #f08a35;
+  color-scheme: light;
 }
 
 *,
@@ -110,12 +157,12 @@ input:focus-visible {
   line-height: 1.45;
 }
 
-/* Felles: måler med spor og fyll */
+/* Shared: meter with track and fill */
 .track {
   position: relative;
   display: block;
   height: 8px;
-  background: rgb(0 0 0 / 0.32);
+  background: var(--well-strong);
   border-radius: 2px;
 }
 .track .fill {
@@ -162,7 +209,7 @@ input:focus-visible {
   border-color: var(--silk-dim);
 }
 
-/* ───────────── Velg maskin ───────────── */
+/* ───────────── Choose machine ───────────── */
 
 .picker {
   position: absolute;
@@ -175,6 +222,93 @@ input:focus-visible {
   flex-direction: column;
   gap: 22px;
   overflow: auto;
+}
+.iconbtn {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  flex: none;
+  border: 1px solid var(--line-strong);
+  border-radius: 4px;
+  color: var(--silk-dim);
+  font-size: 20px;
+  line-height: 1;
+  text-align: center;
+}
+.iconbtn:hover {
+  color: var(--silk);
+  border-color: var(--silk-dim);
+}
+.picker .corner {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  gap: 6px;
+}
+.pickertab,
+.dossiertab {
+  position: absolute;
+  top: var(--gap);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 6px 6px 14px;
+  font: 600 18px/1 var(--display);
+  color: var(--silk);
+}
+.pickertab {
+  left: var(--gap);
+}
+.pickertab > button:not(.iconbtn) {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 4px 4px 0;
+}
+.dossiertab {
+  right: var(--gap);
+  padding: 12px 14px;
+}
+.pickertab .chev,
+.dossiertab .chev {
+  color: var(--pad);
+  font-size: 22px;
+}
+.pickertab:hover,
+.dossiertab:hover {
+  border-color: var(--line-strong);
+}
+.dossier h2 {
+  padding-right: 36px;
+}
+.dossierhide {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+}
+.keyparts dd[data-empty='true'],
+.rname[data-empty='true'] {
+  color: var(--silk-faint);
+  font-style: italic;
+  font-weight: 400;
+}
+.emptynote {
+  padding: 10px 12px;
+  border-left: 3px solid var(--pad);
+  background: var(--well);
+  border-radius: 3px;
+  color: var(--silk-dim);
+  font-size: 13.5px;
+}
+.fpsbox[data-missing='true'] .verdict {
+  background: var(--raise-2);
+  color: var(--silk-dim);
+}
+.topbar .tools .iconbtn {
+  height: 34px;
+  width: 34px;
 }
 .brand svg {
   display: block;
@@ -207,7 +341,7 @@ input:focus-visible {
   border: 1px solid transparent;
 }
 .device:hover {
-  background: rgb(255 255 255 / 0.04);
+  background: var(--hover-4);
 }
 .device[aria-pressed='true'] {
   background: var(--raise);
@@ -435,7 +569,7 @@ input:focus-visible {
 }
 .row:hover,
 .row[data-hover='true'] {
-  background: rgb(255 255 255 / 0.05);
+  background: var(--hover-5);
   color: var(--silk);
 }
 .row[aria-pressed='true'] {
@@ -513,7 +647,7 @@ input:focus-visible {
   margin: -6px 0 8px;
 }
 
-/* Mål */
+/* Target */
 .seg {
   display: grid;
   grid-template-columns: 84px 1fr;
@@ -597,11 +731,11 @@ input:focus-visible {
   border-radius: 3px;
   font-size: 13.5px;
   font-weight: 500;
-  color: #06261a;
+  color: var(--ok-ink);
   background: var(--ok);
 }
 .fpsbox[data-meets='false'] .verdict {
-  color: #2e1500;
+  color: var(--warn-ink);
   background: var(--warn);
 }
 .limits {
@@ -624,12 +758,92 @@ input:focus-visible {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
+/* Spec = filled bar (green if it reaches the target, orange if not). Requirement = gold line. */
+.limit .fill {
+  background: var(--fill-ok);
+  opacity: 0.85;
+}
+.limit[data-meets='false'] .fill {
+  background: var(--fill-warn);
+}
 .limit[data-tight='true'] .fill {
-  background: var(--silk);
+  opacity: 1;
+}
+.limit .mark {
+  top: -6px;
+  bottom: -6px;
+  width: 3px;
+  margin-left: -1.5px;
+  border-radius: 1px;
+  box-shadow: 0 0 0 2px var(--raise);
 }
 .limit[data-tight='true'] .k {
   color: var(--silk);
   font-weight: 600;
+}
+.limit .k {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+.bottleneck {
+  font-style: normal;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--silk-faint);
+}
+.legendrow {
+  margin-bottom: -4px;
+}
+.goalrail {
+  position: relative;
+  height: 18px;
+}
+.goaltag {
+  position: absolute;
+  bottom: 0;
+  transform: translateX(-50%);
+  padding: 1px 6px;
+  border-radius: 3px;
+  background: var(--pad);
+  color: var(--pad-ink);
+  font-size: 11.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: left 0.35s ease;
+}
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  margin: 0 0 8px;
+  font-size: 12.5px;
+  color: var(--silk-dim);
+}
+.legend .sw {
+  display: inline-block;
+  flex: none;
+}
+.legend .sw-spec {
+  width: 18px;
+  height: 8px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--ok) 50%, var(--warn) 50%);
+}
+.legend .sw-goal {
+  width: 3px;
+  height: 14px;
+  margin-left: 8px;
+  background: var(--pad);
+}
+.resrow button[data-meets='true'] strong {
+  color: var(--ok);
+}
+.resrow button[data-meets='false'] strong {
+  color: var(--warn);
 }
 .resrow {
   display: grid;
@@ -661,7 +875,7 @@ input:focus-visible {
   color: var(--silk);
 }
 
-/* Forslag */
+/* Suggestions */
 .tips {
   display: grid;
   gap: 8px;
@@ -671,7 +885,7 @@ input:focus-visible {
   align-items: center;
   gap: 12px;
   padding: 11px 12px;
-  background: rgb(0 0 0 / 0.2);
+  background: var(--well);
   border-radius: 5px;
 }
 .tips li div {
@@ -704,7 +918,7 @@ input:focus-visible {
   padding: 11px 12px;
   border-radius: 5px;
   border-left: 3px solid var(--tip);
-  background: rgb(0 0 0 / 0.2);
+  background: var(--well);
 }
 .issue svg {
   margin-top: 2px;
@@ -728,7 +942,7 @@ input:focus-visible {
   background: rgb(255 157 77 / 0.09);
 }
 button.issue:hover {
-  background-color: rgb(255 255 255 / 0.07);
+  background-color: var(--hover-7);
 }
 .inspector .issue {
   margin-top: 12px;
@@ -737,7 +951,7 @@ button.issue:hover {
   color: var(--ok);
 }
 
-/* Strøm og kostnader */
+/* Power and costs */
 .power {
   margin: 4px 0 10px;
 }
@@ -761,7 +975,7 @@ button.issue:hover {
   border-radius: 4px;
 }
 .costs button:not(:disabled):hover {
-  background: rgb(255 255 255 / 0.05);
+  background: var(--hover-5);
 }
 .costs button:disabled {
   cursor: default;
@@ -779,7 +993,7 @@ button.issue:hover {
   margin: 8px 0 14px;
 }
 
-/* Inspektør */
+/* Inspector */
 .sheet-head {
   display: flex;
   align-items: center;
@@ -864,7 +1078,7 @@ button.issue:hover {
 }
 .option:hover {
   border-color: var(--line-strong);
-  background: rgb(255 255 255 / 0.04);
+  background: var(--hover-4);
 }
 .option[aria-pressed='true'] {
   background: var(--raise);
@@ -930,7 +1144,7 @@ button.issue:hover {
 }
 .fixed {
   padding: 11px 12px;
-  background: rgb(0 0 0 / 0.2);
+  background: var(--well);
   border-radius: 5px;
   color: var(--silk-dim);
 }
@@ -1011,7 +1225,7 @@ button.issue:hover {
   color: var(--err);
 }
 .cell.status:hover {
-  background: rgb(255 255 255 / 0.05);
+  background: var(--hover-5);
 }
 
 .hint {
@@ -1031,7 +1245,7 @@ button.issue:hover {
   }
 }
 
-/* Varsler som dukker opp etter et bytte */
+/* Warnings that pop up after a swap */
 .toasts {
   position: absolute;
   bottom: 96px;
@@ -1046,14 +1260,14 @@ button.issue:hover {
   gap: 10px;
   padding: 11px 14px;
   border-radius: 6px;
-  background: #1b1512;
+  background: var(--toast-bg);
   border: 1px solid var(--warn);
-  box-shadow: 0 10px 30px rgb(0 0 0 / 0.45);
+  box-shadow: 0 10px 30px var(--shadow);
   animation: toast-in 0.28s cubic-bezier(0.2, 0.9, 0.3, 1.2);
 }
 .toast-error {
   border-color: var(--err);
-  background: #1f1312;
+  background: var(--toast-err-bg);
 }
 .toast svg {
   margin-top: 2px;
@@ -1082,7 +1296,7 @@ button.issue:hover {
   z-index: 20;
   display: grid;
   padding: 7px 11px 8px;
-  background: #0b1f1c;
+  background: var(--tip-bg);
   border: 1px solid var(--line-strong);
   border-radius: 5px;
   pointer-events: none;
@@ -1107,7 +1321,7 @@ button.issue:hover {
   color: var(--pad);
 }
 
-/* Lave vinduer: delelisten skal få plass uten å rulle */
+/* Small windows: the parts list should fit without scrolling */
 @media (max-height: 780px) and (min-width: 981px) {
   .row {
     padding-top: 5px;
@@ -1122,7 +1336,7 @@ button.issue:hover {
   }
 }
 
-/* ───────────── Smale skjermer ───────────── */
+/* ───────────── Narrow screens ───────────── */
 
 @media (max-width: 980px) {
   .picker {
@@ -1199,4 +1413,8 @@ button.issue:hover {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+:root[data-theme='light'] .swatches button:not([aria-checked='true']) {
+  box-shadow: inset 0 0 0 1px var(--line-strong);
 }

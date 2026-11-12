@@ -14,12 +14,12 @@ import type {
 } from './types'
 
 /*
- * Priser er omtrentlige norske butikkpriser fra november 2026.
- * Minne, SSD-er og skjermkort er uvanlig dyre akkurat nå på grunn av minnemangelen.
- * Ytelsestall er grove snitt fra offentlige tester og er ment for sammenligning.
+ * Prices are approximate Norwegian retail prices from November 2026.
+ * Memory, SSDs and graphics cards are unusually expensive right now due to a memory shortage.
+ * Performance numbers are rough averages from public tests and are meant for comparison.
  */
 
-// ───────────────────────────── Prosessorer ─────────────────────────────
+// ───────────────────────────── Processors ─────────────────────────────
 
 export const cpus: Cpu[] = [
   {
@@ -64,19 +64,19 @@ export const cpus: Cpu[] = [
   },
   {
     kind: 'cpu', id: 'u5-250k', name: 'Intel Core Ultra 5 250K Plus', short: 'Core Ultra 5 250K Plus', brand: 'Intel', price: 2490,
-    socket: 'LGA1851', arch: 'Arrow Lake Refresh', cores: 18, threads: 18, coreLayout: '6 P-kjerner + 12 E-kjerner',
+    socket: 'LGA1851', arch: 'Arrow Lake Refresh', cores: 18, threads: 18, coreLayout: '6 P-cores + 12 E-cores',
     boost: 5.3, l3: 30, tdp: 125, peak: 159, gamingPower: 85,
     gaming: 79, multi: 105, igpu: 'Intel Graphics', x3d: false, ramType: 'DDR5', year: 2026, unlocked: true,
   },
   {
     kind: 'cpu', id: 'u7-270k', name: 'Intel Core Ultra 7 270K Plus', short: 'Core Ultra 7 270K Plus', brand: 'Intel', price: 3990,
-    socket: 'LGA1851', arch: 'Arrow Lake Refresh', cores: 24, threads: 24, coreLayout: '8 P-kjerner + 16 E-kjerner',
+    socket: 'LGA1851', arch: 'Arrow Lake Refresh', cores: 24, threads: 24, coreLayout: '8 P-cores + 16 E-cores',
     boost: 5.5, l3: 36, tdp: 125, peak: 250, gamingPower: 110,
     gaming: 84, multi: 150, igpu: 'Intel Graphics', x3d: false, ramType: 'DDR5', year: 2026, unlocked: true,
   },
 ]
 
-// ───────────────────────────── Skjermkort ─────────────────────────────
+// ───────────────────────────── Graphics cards ─────────────────────────────
 
 export const gpus: Gpu[] = [
   {
@@ -136,7 +136,7 @@ export const gpus: Gpu[] = [
   },
 ]
 
-// ───────────────────────────── Hovedkort ─────────────────────────────
+// ───────────────────────────── Motherboards ─────────────────────────────
 
 export const motherboards: Motherboard[] = [
   {
@@ -171,7 +171,7 @@ export const motherboards: Motherboard[] = [
   },
 ]
 
-// ───────────────────────────── Minne ─────────────────────────────
+// ───────────────────────────── Memory ─────────────────────────────
 
 export const rams: Ram[] = [
   {
@@ -183,7 +183,7 @@ export const rams: Ram[] = [
     type: 'DDR4', sticks: 2, perStick: 16, speed: 3600, cl: 18, rgb: false, color: 'black', form: 'DIMM',
   },
   {
-    kind: 'ram', id: 'ram-d5-16x1', name: 'Kingston Fury Beast 16 GB (1×16) DDR5-5600 CL36', short: '16 GB DDR5 (én brikke)', brand: 'Kingston', price: 3090,
+    kind: 'ram', id: 'ram-d5-16x1', name: 'Kingston Fury Beast 16 GB (1×16) DDR5-5600 CL36', short: '16 GB DDR5 (one stick)', brand: 'Kingston', price: 3090,
     type: 'DDR5', sticks: 1, perStick: 16, speed: 5600, cl: 36, rgb: false, color: 'black', form: 'DIMM',
   },
   {
@@ -204,7 +204,7 @@ export const rams: Ram[] = [
   },
 ]
 
-// ───────────────────────────── Lagring ─────────────────────────────
+// ───────────────────────────── Storage ─────────────────────────────
 
 export const storages: Storage[] = [
   {
@@ -233,40 +233,40 @@ export const storages: Storage[] = [
   },
 ]
 
-// ───────────────────────────── Strømforsyninger ─────────────────────────────
+// ───────────────────────────── Power supplies ─────────────────────────────
 
 export const psus: Psu[] = [
   {
     kind: 'psu', id: 'psu-550b', name: 'Corsair CX550', short: '550 W Bronze', brand: 'Corsair', price: 690,
-    watt: 550, rating: '80 Plus Bronze', modular: 'Faste kabler', atx3: false, length: 140,
+    watt: 550, rating: '80 Plus Bronze', modular: 'Fixed cables', atx3: false, length: 140,
   },
   {
     kind: 'psu', id: 'psu-650g', name: 'be quiet! Pure Power 12 M 650 W', short: '650 W Gold', brand: 'be quiet!', price: 1090,
-    watt: 650, rating: '80 Plus Gold', modular: 'Helmodulær', atx3: true, length: 160,
+    watt: 650, rating: '80 Plus Gold', modular: 'Fully modular', atx3: true, length: 160,
   },
   {
     kind: 'psu', id: 'psu-750g', name: 'Corsair RM750e', short: '750 W Gold', brand: 'Corsair', price: 1290,
-    watt: 750, rating: '80 Plus Gold', modular: 'Helmodulær', atx3: true, length: 140,
+    watt: 750, rating: '80 Plus Gold', modular: 'Fully modular', atx3: true, length: 140,
   },
   {
     kind: 'psu', id: 'psu-850g', name: 'Corsair RM850x', short: '850 W Gold', brand: 'Corsair', price: 1690,
-    watt: 850, rating: '80 Plus Gold', modular: 'Helmodulær', atx3: true, length: 160,
+    watt: 850, rating: '80 Plus Gold', modular: 'Fully modular', atx3: true, length: 160,
   },
   {
     kind: 'psu', id: 'psu-1000g', name: 'Corsair RM1000x', short: '1000 W Gold', brand: 'Corsair', price: 2390,
-    watt: 1000, rating: '80 Plus Gold', modular: 'Helmodulær', atx3: true, length: 160,
+    watt: 1000, rating: '80 Plus Gold', modular: 'Fully modular', atx3: true, length: 160,
   },
   {
     kind: 'psu', id: 'psu-1200p', name: 'Corsair HX1200i', short: '1200 W Platinum', brand: 'Corsair', price: 3490,
-    watt: 1200, rating: '80 Plus Platinum', modular: 'Helmodulær', atx3: true, length: 180,
+    watt: 1200, rating: '80 Plus Platinum', modular: 'Fully modular', atx3: true, length: 180,
   },
 ]
 
-// ───────────────────────────── CPU-kjølere ─────────────────────────────
+// ───────────────────────────── CPU coolers ─────────────────────────────
 
 export const coolers: Cooler[] = [
   {
-    kind: 'cooler', id: 'cool-stock', name: 'AMD Wraith Stealth (følger med)', short: 'Wraith Stealth', brand: 'AMD', price: 0,
+    kind: 'cooler', id: 'cool-stock', name: 'AMD Wraith Stealth (included)', short: 'Wraith Stealth', brand: 'AMD', price: 0,
     type: 'stock', capacity: 65, height: 54, radiator: 0, fans: 1, noise: 39, sockets: ['AM4', 'AM5'],
   },
   {
@@ -291,11 +291,11 @@ export const coolers: Cooler[] = [
   },
 ]
 
-// ───────────────────────────── Kabinetter ─────────────────────────────
+// ───────────────────────────── Cases ─────────────────────────────
 
 export const cases: Case[] = [
   {
-    kind: 'case', id: 'case-ch370', name: 'DeepCool CH370', short: 'CH370 (kompakt mATX)', brand: 'DeepCool', price: 790,
+    kind: 'case', id: 'case-ch370', name: 'DeepCool CH370', short: 'CH370 (compact mATX)', brand: 'DeepCool', price: 790,
     forms: ['mATX'], dims: { w: 215, h: 431, d: 402 }, gpuMax: 320, coolerMax: 165, radTop: 240,
     frontFans: 2, fanSize: 120, style: 'mesh', color: 'white',
   },
@@ -305,13 +305,13 @@ export const cases: Case[] = [
     frontFans: 2, fanSize: 140, style: 'slats', color: 'black',
   },
   {
-    kind: 'case', id: 'case-l216', name: 'Lian Li Lancool 216', short: 'Lancool 216 (stor ATX)', brand: 'Lian Li', price: 1290,
+    kind: 'case', id: 'case-l216', name: 'Lian Li Lancool 216', short: 'Lancool 216 (large ATX)', brand: 'Lian Li', price: 1290,
     forms: ['ATX', 'mATX'], dims: { w: 235, h: 492, d: 481 }, gpuMax: 392, coolerMax: 180, radTop: 360,
     frontFans: 2, fanSize: 160, style: 'mesh', color: 'black',
   },
 ]
 
-// ───────────────────────────── Bærbare: deler ─────────────────────────────
+// ───────────────────────────── Laptops: parts ─────────────────────────────
 
 const laptopCpus: Cpu[] = [
   {
@@ -321,13 +321,13 @@ const laptopCpus: Cpu[] = [
   },
   {
     kind: 'cpu', id: 'l-u9-386h', name: 'Intel Core Ultra 9 386H', short: 'Core Ultra 9 386H', brand: 'Intel', price: 0,
-    socket: 'BGA', arch: 'Panther Lake', cores: 16, threads: 16, coreLayout: '4 P-kjerner + 8 E-kjerner + 4 LP E-kjerner',
+    socket: 'BGA', arch: 'Panther Lake', cores: 16, threads: 16, coreLayout: '4 P-cores + 8 E-cores + 4 LP E-cores',
     boost: 5.1, l3: 18, tdp: 45, peak: 80, gamingPower: 50,
     gaming: 68, multi: 88, igpu: 'Intel Arc', x3d: false, ramType: 'DDR5', year: 2026,
   },
   {
     kind: 'cpu', id: 'l-u9-290hx', name: 'Intel Core Ultra 9 290HX Plus', short: 'Core Ultra 9 290HX Plus', brand: 'Intel', price: 0,
-    socket: 'BGA', arch: 'Arrow Lake Refresh', cores: 24, threads: 24, coreLayout: '8 P-kjerner + 16 E-kjerner',
+    socket: 'BGA', arch: 'Arrow Lake Refresh', cores: 24, threads: 24, coreLayout: '8 P-cores + 16 E-cores',
     boost: 5.5, l3: 36, tdp: 55, peak: 160, gamingPower: 75,
     gaming: 82, multi: 135, igpu: 'Intel Graphics', x3d: false, ramType: 'DDR5', year: 2026,
   },
@@ -347,14 +347,14 @@ const laptopGpus: Gpu[] = [
   lg('l-rtx5070ti', 'RTX 5070 Ti', 0, 12, [110, 77, 43], 140),
   lg('l-rtx5080', 'RTX 5080', 8000, 16, [135, 97, 56], 175),
   lg('l-rtx5090', 'RTX 5090', 23000, 24, [150, 110, 65], 175),
-  // Zephyrus G14 har egne prispåslag
+  // Zephyrus G14 has its own price markups
   lg('g14-rtx5070ti', 'RTX 5070 Ti', 0, 12, [110, 77, 43], 120),
   lg('g14-rtx5080', 'RTX 5080', 7000, 16, [135, 97, 56], 130),
 ]
 
 const laptopRams: Ram[] = [
   {
-    kind: 'ram', id: 'l-ram-16x1', name: '16 GB (1×16) DDR5-5600 SO-DIMM', short: '16 GB (én brikke)', brand: 'Lenovo', price: 0,
+    kind: 'ram', id: 'l-ram-16x1', name: '16 GB (1×16) DDR5-5600 SO-DIMM', short: '16 GB (one stick)', brand: 'Lenovo', price: 0,
     type: 'DDR5', sticks: 1, perStick: 16, speed: 5600, cl: 46, rgb: false, color: 'black', form: 'SO-DIMM',
   },
   {
@@ -370,8 +370,8 @@ const laptopRams: Ram[] = [
     type: 'DDR5', sticks: 2, perStick: 32, speed: 5600, cl: 46, rgb: false, color: 'black', form: 'SO-DIMM',
   },
   {
-    kind: 'ram', id: 'g14-ram-32', name: '32 GB LPDDR5X-7467 (loddet)', short: '32 GB LPDDR5X', brand: 'ASUS', price: 0,
-    type: 'DDR5', sticks: 2, perStick: 16, speed: 7467, cl: 40, rgb: false, color: 'black', form: 'Loddet',
+    kind: 'ram', id: 'g14-ram-32', name: '32 GB LPDDR5X-7467 (soldered)', short: '32 GB LPDDR5X', brand: 'ASUS', price: 0,
+    type: 'DDR5', sticks: 2, perStick: 16, speed: 7467, cl: 40, rgb: false, color: 'black', form: 'Soldered',
   },
 ]
 
@@ -396,23 +396,23 @@ const laptopStorages: Storage[] = [
 
 const displays: Display[] = [
   {
-    kind: 'display', id: 'd-loq', name: '15,6" Full HD IPS, 144 Hz', short: '15,6" FHD 144 Hz', brand: 'Lenovo', price: 0,
-    size: 15.6, res: [1920, 1080], hz: 144, panel: 'IPS', nits: 300, gamut: '100 % sRGB', native: 1080,
+    kind: 'display', id: 'd-loq', name: '15.6" Full HD IPS, 144 Hz', short: '15.6" FHD 144 Hz', brand: 'Lenovo', price: 0,
+    size: 15.6, res: [1920, 1080], hz: 144, panel: 'IPS', nits: 300, gamut: '100% sRGB', native: 1080,
   },
   {
     kind: 'display', id: 'd-g14', name: '14" 3K OLED, 120 Hz', short: '14" 3K OLED 120 Hz', brand: 'ASUS', price: 0,
-    size: 14, res: [2880, 1800], hz: 120, panel: 'OLED', nits: 500, gamut: '100 % DCI-P3', native: 1440,
+    size: 14, res: [2880, 1800], hz: 120, panel: 'OLED', nits: 500, gamut: '100% DCI-P3', native: 1440,
   },
   {
     kind: 'display', id: 'd-pro7', name: '16" WQXGA OLED, 240 Hz', short: '16" OLED 240 Hz', brand: 'Lenovo', price: 0,
-    size: 16, res: [2560, 1600], hz: 240, panel: 'OLED', nits: 500, gamut: '100 % DCI-P3', native: 1440,
+    size: 16, res: [2560, 1600], hz: 240, panel: 'OLED', nits: 500, gamut: '100% DCI-P3', native: 1440,
   },
 ]
 
 const batteries: Battery[] = [
-  { kind: 'battery', id: 'b-loq', name: '60 Wh litium-ion', short: '60 Wh', brand: 'Lenovo', price: 0, wh: 60, hoursLight: 6, hoursGaming: 1.2, charger: 170 },
-  { kind: 'battery', id: 'b-g14', name: '73 Wh litium-polymer', short: '73 Wh', brand: 'ASUS', price: 0, wh: 73, hoursLight: 8.5, hoursGaming: 1.5, charger: 200 },
-  { kind: 'battery', id: 'b-pro7', name: '99 Wh litium-polymer', short: '99 Wh', brand: 'Lenovo', price: 0, wh: 99, hoursLight: 5.5, hoursGaming: 1.3, charger: 330 },
+  { kind: 'battery', id: 'b-loq', name: '60 Wh lithium-ion', short: '60 Wh', brand: 'Lenovo', price: 0, wh: 60, hoursLight: 6, hoursGaming: 1.2, charger: 170 },
+  { kind: 'battery', id: 'b-g14', name: '73 Wh lithium-polymer', short: '73 Wh', brand: 'ASUS', price: 0, wh: 73, hoursLight: 8.5, hoursGaming: 1.5, charger: 200 },
+  { kind: 'battery', id: 'b-pro7', name: '99 Wh lithium-polymer', short: '99 Wh', brand: 'Lenovo', price: 0, wh: 99, hoursLight: 5.5, hoursGaming: 1.3, charger: 330 },
 ]
 
 const info = (id: string, name: string, short: string, brand: string, rows: Info['rows']): Info => ({
@@ -421,69 +421,69 @@ const info = (id: string, name: string, short: string, brand: string, rows: Info
 
 const infos: Info[] = [
   // Chassis
-  info('c-loq', 'Plastchassis, 15,6"', 'Plast, 2,4 kg', 'Lenovo', [
-    ['Vekt', '2,4 kg', 'Lett nok til sekken, men du merker den. Laderen på 170 W veier rundt 0,5 kg i tillegg.'],
-    ['Tykkelse', '24 mm'],
-    ['Materiale', 'Plast', 'Billigere og litt mykere enn metall. Tåler vanlig bruk fint.'],
-    ['Tastatur', 'Hvit bakbelysning, numerisk del'],
-    ['Porter', '3× USB-A, 1× USB-C, HDMI 2.1, nettverk'],
+  info('c-loq', 'Plastic chassis, 15.6"', 'Plastic, 2.4 kg', 'Lenovo', [
+    ['Weight', '2.4 kg', 'Light enough for a backpack, but you notice it. The 170 W charger adds about 0.5 kg on top.'],
+    ['Thickness', '24 mm'],
+    ['Material', 'Plastic', 'Cheaper and a bit softer than metal. Handles everyday use just fine.'],
+    ['Keyboard', 'White backlight, numeric keypad'],
+    ['Ports', '3× USB-A, 1× USB-C, HDMI 2.1, network'],
   ]),
-  info('c-g14', 'Aluminiumschassis, 14"', 'Aluminium, 1,5 kg', 'ASUS', [
-    ['Vekt', '1,5 kg', 'Uvanlig lett for en spillmaskin. Prisen er mindre plass til kjøling.'],
-    ['Tykkelse', '16 mm'],
-    ['Materiale', 'Frest aluminium', 'Stivt og leder varme godt, men blir varmt å ta på under spilling.'],
-    ['Tastatur', 'RGB-bakbelysning'],
-    ['Porter', '2× USB-C (én Thunderbolt 4), 2× USB-A, HDMI 2.1, microSD'],
+  info('c-g14', 'Aluminum chassis, 14"', 'Aluminum, 1.5 kg', 'ASUS', [
+    ['Weight', '1.5 kg', 'Unusually light for a gaming machine. The price is less room for cooling.'],
+    ['Thickness', '16 mm'],
+    ['Material', 'Milled aluminum', 'Rigid and conducts heat well, but gets warm to the touch while gaming.'],
+    ['Keyboard', 'RGB backlight'],
+    ['Ports', '2× USB-C (one Thunderbolt 4), 2× USB-A, HDMI 2.1, microSD'],
   ]),
-  info('c-pro7', 'Aluminiumschassis, 16"', 'Aluminium, 2,6 kg', 'Lenovo', [
-    ['Vekt', '2,6 kg', 'Laderen på 330 W veier nesten ett kilo til. Dette er en maskin som stort sett står på pulten.'],
-    ['Tykkelse', '26 mm', 'Tykkelsen gir plass til et dampkammer og store vifter.'],
-    ['Materiale', 'Aluminium'],
-    ['Tastatur', 'RGB per tast, numerisk del'],
-    ['Porter', '2× Thunderbolt, 3× USB-A, HDMI 2.1, nettverk 2,5 Gbit'],
+  info('c-pro7', 'Aluminum chassis, 16"', 'Aluminum, 2.6 kg', 'Lenovo', [
+    ['Weight', '2.6 kg', 'The 330 W charger weighs almost another kilo. This is a machine that mostly stays on the desk.'],
+    ['Thickness', '26 mm', 'The thickness makes room for a vapor chamber and large fans.'],
+    ['Material', 'Aluminum'],
+    ['Keyboard', 'Per-key RGB, numeric keypad'],
+    ['Ports', '2× Thunderbolt, 3× USB-A, HDMI 2.1, 2.5 Gbit network'],
   ]),
-  // Kjøling
-  info('k-loq', 'To vifter og tre varmerør', '2 vifter, 3 varmerør', 'Lenovo', [
-    ['Vifter', '2', 'Hver vifte trekker luft inn under maskinen og blåser den ut bak.'],
-    ['Varmerør', '3 kobberrør', 'Rørene er hule med litt væske. Væsken fordamper ved brikken og kondenserer ved ribbene – slik flyttes varmen.'],
-    ['Samlet kjøleeffekt', 'ca. 160 W'],
-    ['Støy under spilling', 'ca. 50 dB', 'Tydelig hørbart. De fleste bruker hodetelefoner.'],
+  // Cooling
+  info('k-loq', 'Two fans and three heat pipes', '2 fans, 3 heat pipes', 'Lenovo', [
+    ['Fans', '2', 'Each fan pulls air in under the machine and blows it out the back.'],
+    ['Heat pipes', '3 copper pipes', 'The pipes are hollow with a bit of liquid inside. The liquid evaporates at the chip and condenses at the fins – that is how the heat is moved.'],
+    ['Total cooling capacity', 'approx. 160 W'],
+    ['Noise while gaming', 'approx. 50 dB', 'Clearly audible. Most people use headphones.'],
   ]),
-  info('k-g14', 'To vifter og dampkammer', '2 vifter, dampkammer', 'ASUS', [
-    ['Vifter', '2 (+ en liten hjelpevifte)'],
-    ['Varmespreder', 'Dampkammer', 'Et dampkammer er et flatt varmerør som dekker både prosessor og skjermkort.'],
-    ['Termisk masse', 'Flytende metall på CPU', 'Flytende metall leder varme bedre enn vanlig kjølepasta.'],
-    ['Samlet kjøleeffekt', 'ca. 160 W', 'Derfor får skjermkortet mindre effekt her enn i tykkere maskiner.'],
-    ['Støy under spilling', 'ca. 46 dB'],
+  info('k-g14', 'Two fans and vapor chamber', '2 fans, vapor chamber', 'ASUS', [
+    ['Fans', '2 (+ a small auxiliary fan)'],
+    ['Heat spreader', 'Vapor chamber', 'A vapor chamber is a flat heat pipe that covers both the processor and graphics card.'],
+    ['Thermal compound', 'Liquid metal on CPU', 'Liquid metal conducts heat better than ordinary thermal paste.'],
+    ['Total cooling capacity', 'approx. 160 W', 'That is why the graphics card gets less power here than in thicker machines.'],
+    ['Noise while gaming', 'approx. 46 dB'],
   ]),
-  info('k-pro7', 'To store vifter og dampkammer', '2 vifter, stort dampkammer', 'Lenovo', [
-    ['Vifter', '2 store'],
-    ['Varmespreder', 'Dampkammer over hele hovedkortet'],
-    ['Samlet kjøleeffekt', 'ca. 250 W', 'Nok til at skjermkortet får full effekt (175 W) samtidig som prosessoren jobber.'],
-    ['Støy under spilling', 'ca. 52 dB'],
+  info('k-pro7', 'Two large fans and vapor chamber', '2 fans, large vapor chamber', 'Lenovo', [
+    ['Fans', '2 large'],
+    ['Heat spreader', 'Vapor chamber across the entire motherboard'],
+    ['Total cooling capacity', 'approx. 250 W', 'Enough for the graphics card to get full power (175 W) while the processor is also working.'],
+    ['Noise while gaming', 'approx. 52 dB'],
   ]),
-  // Hovedkort
-  info('m-loq', 'Hovedkort med Ryzen-plattform', '2 RAM-spor, 2 M.2', 'Lenovo', [
-    ['Prosessor og skjermkort', 'Loddet fast', 'Sitter med hundrevis av loddekuler (BGA) og kan ikke byttes.'],
-    ['RAM-spor', '2× SO-DIMM', 'Vanlige, utskiftbare minnebrikker i bærbar størrelse.'],
-    ['M.2-plasser', '2', 'Du kan sette inn en ekstra SSD selv.'],
-    ['Trådløst', 'Wi-Fi 6, Bluetooth 5.2'],
+  // Motherboards
+  info('m-loq', 'Motherboard with Ryzen platform', '2 RAM slots, 2 M.2', 'Lenovo', [
+    ['Processor and graphics card', 'Soldered on', 'Attached with hundreds of solder balls (BGA) and cannot be swapped.'],
+    ['RAM slots', '2× SO-DIMM', 'Standard, replaceable memory sticks in laptop size.'],
+    ['M.2 slots', '2', 'You can install an extra SSD yourself.'],
+    ['Wireless', 'Wi-Fi 6, Bluetooth 5.2'],
   ]),
-  info('m-g14', 'Kompakt hovedkort', 'Loddet RAM, 1 M.2', 'ASUS', [
-    ['Prosessor og skjermkort', 'Loddet fast'],
-    ['Minne', 'Loddet LPDDR5X', 'Loddet minne er raskere og tar mindre plass, men kan aldri oppgraderes. Velg nok ved kjøp.'],
-    ['M.2-plasser', '1', 'Vil du ha mer lagring, må den gamle SSD-en ut.'],
-    ['Trådløst', 'Wi-Fi 7, Bluetooth 5.4'],
+  info('m-g14', 'Compact motherboard', 'Soldered RAM, 1 M.2', 'ASUS', [
+    ['Processor and graphics card', 'Soldered on'],
+    ['Memory', 'Soldered LPDDR5X', 'Soldered memory is faster and takes up less space, but can never be upgraded. Choose enough when you buy.'],
+    ['M.2 slots', '1', 'If you want more storage, the old SSD has to come out.'],
+    ['Wireless', 'Wi-Fi 7, Bluetooth 5.4'],
   ]),
-  info('m-pro7', 'Hovedkort med HX-plattform', '2 RAM-spor, 2 M.2', 'Lenovo', [
-    ['Prosessor og skjermkort', 'Loddet fast'],
-    ['RAM-spor', '2× SO-DIMM (opptil 64 GB)'],
-    ['M.2-plasser', '2'],
-    ['Trådløst', 'Wi-Fi 7, Bluetooth 5.4'],
+  info('m-pro7', 'Motherboard with HX platform', '2 RAM slots, 2 M.2', 'Lenovo', [
+    ['Processor and graphics card', 'Soldered on'],
+    ['RAM slots', '2× SO-DIMM (up to 64 GB)'],
+    ['M.2 slots', '2'],
+    ['Wireless', 'Wi-Fi 7, Bluetooth 5.4'],
   ]),
 ]
 
-// ───────────────────────────── Oppslag ─────────────────────────────
+// ───────────────────────────── Lookup ─────────────────────────────
 
 export const desktopByKind = {
   cpu: cpus,

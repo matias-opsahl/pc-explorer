@@ -6,7 +6,7 @@ import { createRoot } from 'react-dom/client'
 import App from './App'
 import './styles.css'
 
-// Merkelappene på delene tegnes med skriften, så den må være lastet før 3D-scenen bygges
+// The part labels are drawn with the font, so it must be loaded before the 3D scene is built
 const fonts = Promise.all(
   [500, 600, 700].map((w) => document.fonts.load(`${w} 40px "Saira Condensed"`)),
 )

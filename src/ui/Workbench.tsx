@@ -4,9 +4,9 @@ import { component, slotLevel } from '../logic/evaluate'
 import { RGB_CHOICES, useBuild, useDevice, useEvaluation, useGoal, useStore } from '../store'
 import { Inspector } from './Inspector'
 import { Summary } from './Summary'
-import { LevelIcon, SlotIcon } from './icons'
+import { LevelIcon, SlotIcon, ThemeButton } from './icons'
 
-/** Viser forskjellen en kort stund etter at et tall har endret seg */
+/** Shows the difference for a short while after a number has changed */
 function useDelta(value: number, key: string) {
   const prev = useRef({ value, key })
   const [delta, setDelta] = useState(0)
@@ -32,21 +32,22 @@ function TopBar() {
   return (
     <header className="panel topbar" data-inset="top">
       <button className="ghost back" onClick={s.back}>
-        Bytt maskin
+        Change machine
       </button>
       <div className="title">
         <strong>{device.name}</strong>
         <span>{device.tagline}</span>
       </div>
       <div className="tools">
-        {toggle('exploded', 'Sprengskisse')}
-        {device.kind === 'desktop' && toggle('glass', 'Sidepanel')}
-        {toggle('spin', 'Roter')}
-        <div className="swatches" role="radiogroup" aria-label="Lysfarge">
+        {toggle('exploded', 'Exploded view')}
+        {device.kind === 'desktop' && toggle('glass', 'Side panel')}
+        {toggle('spin', 'Rotate')}
+        <div className="swatches" role="radiogroup" aria-label="Light color">
           {RGB_CHOICES.map((c) => (
-            <button key={c} role="radio" aria-checked={s.rgb === c} aria-label={`Lysfarge ${c}`} style={{ background: c }} onClick={() => s.setRgb(c)} />
+            <button key={c} role="radio" aria-checked={s.rgb === c} aria-label={`Light color ${c}`} style={{ background: c }} onClick={() => s.setRgb(c)} />
           ))}
         </div>
+        <ThemeButton />
       </div>
     </header>
   )
@@ -61,11 +62,11 @@ function PartList() {
   const select = useStore((s) => s.select)
   const hover = useStore((s) => s.hover)
   return (
-    <nav className="panel bom" data-inset="auto" aria-label="Deler">
+    <nav className="panel bom" data-inset="auto" aria-label="Parts">
       <button className="row whole" aria-pressed={!selected} onClick={() => select(null)}>
         <span className="rtext">
-          <span className="rlabel">Hele maskinen</span>
-          <span className="rname">Ytelse, pris og varsler</span>
+          <span className="rlabel">Whole machine</span>
+          <span className="rname">Performance, price and warnings</span>
         </span>
       </button>
       {device.slots.map((slot) => {
@@ -83,7 +84,7 @@ function PartList() {
             <SlotIcon slot={slot} />
             <span className="rtext">
               <span className="rlabel">{slotText(device.kind, slot).label}</span>
-              <span className="rname">{component(build, slot)?.short}</span>
+              <span className="rname" data-empty={!component(build, slot)}>{component(build, slot)?.short ?? 'Empty – choose a part'}</span>
             </span>
             {level && <LevelIcon level={level} />}
           </button>
@@ -95,6 +96,7 @@ function PartList() {
 
 function Readout() {
   const device = useDevice()
+  const build = useBuild()
   const goal = useGoal()
   const e = useEvaluation()
   const select = useStore((s) => s.select)
@@ -103,12 +105,13 @@ function Readout() {
   const dFps = useDelta(e.perf.fps, key)
   const errors = e.issues.filter((i) => i.level === 'error').length
   const warnings = e.issues.filter((i) => i.level === 'warning').length
-  const level = errors ? 'error' : warnings ? 'warning' : 'ok'
+  const empty = device.slots.filter((slot) => !build[slot]).length
+  const level = errors ? 'error' : warnings || empty ? 'warning' : 'ok'
   const batt = e.parts.battery
   return (
     <footer className="panel readout" data-inset="bottom">
       <div className="cell">
-        <span className="k">Pris</span>
+        <span className="k">Price</span>
         <span className="v">{kr(e.price)}</span>
         {dPrice !== 0 && <span className={`delta ${dPrice > 0 ? 'bad' : 'good'}`}>{signedKr(dPrice)}</span>}
       </div>
@@ -125,23 +128,23 @@ function Readout() {
             {Math.abs(dFps)}
           </span>
         ) : (
-          <span className="sub">mål {goal.target}</span>
+          <span className="sub">target {goal.target}</span>
         )}
       </div>
       {device.kind === 'desktop' ? (
         <div className="cell">
-          <span className="k">Strøm under spilling</span>
+          <span className="k">Power while gaming</span>
           <span className="v">
             {e.power.gaming} <small>W</small>
           </span>
-          <span className="sub">av {e.power.psu} W</span>
+          <span className="sub">of {e.power.psu} W</span>
         </div>
       ) : (
         batt && (
           <div className="cell">
-            <span className="k">Batteri, lett bruk</span>
+            <span className="k">Battery, light use</span>
             <span className="v">
-              {String(batt.hoursLight).replace('.', ',')} <small>timer</small>
+              {batt.hoursLight} <small>hours</small>
             </span>
           </div>
         )
@@ -150,10 +153,12 @@ function Readout() {
         <LevelIcon level={level} />
         <span>
           {errors
-            ? `${errors} ${errors === 1 ? 'del passer' : 'deler passer'} ikke`
+            ? `${errors} ${errors === 1 ? 'part does not fit' : 'parts do not fit'}`
             : warnings
-              ? `${warnings} ${warnings === 1 ? 'varsel' : 'varsler'}`
-              : 'Alt passer sammen'}
+              ? `${warnings} ${warnings === 1 ? 'warning' : 'warnings'}`
+              : empty
+                ? `${empty} ${empty === 1 ? 'part' : 'parts'} still missing`
+                : 'Everything fits together'}
         </span>
       </button>
     </footer>
@@ -164,7 +169,7 @@ function Toasts() {
   const toasts = useStore((s) => s.toasts)
   const dismiss = useStore((s) => s.dismiss)
   const select = useStore((s) => s.select)
-  // Hvert varsel får sin egen nedtelling, så flere samtidige ikke blir stående i kø
+  // Each notification gets its own countdown, so several at once don't queue up
   const timers = useRef(new Map<number, number>())
   useEffect(() => {
     for (const t of toasts) {
@@ -219,12 +224,12 @@ export function Workbench() {
       </aside>
       <Readout />
       <Toasts />
-      <p className="hint">Dra for å snu maskinen. Rull for å zoome. Klikk på en del for å åpne den.</p>
+      <p className="hint">Drag to rotate the machine. Scroll to zoom. Click a part to open it.</p>
     </>
   )
 }
 
-/** Navnelapp som følger pekeren over 3D-modellen */
+/** Name label that follows the pointer over the 3D model */
 export function HoverTip() {
   const device = useDevice()
   const build = useBuild()
@@ -250,8 +255,8 @@ export function HoverTip() {
       {hovered && (
         <>
           <strong>{slotText(device.kind, hovered).label}</strong>
-          <span>{component(build, hovered)?.short}</span>
-          {hovered !== selected && <em>Klikk for å åpne</em>}
+          <span>{component(build, hovered)?.short ?? 'Empty'}</span>
+          {hovered !== selected && <em>Click to open</em>}
         </>
       )}
     </div>

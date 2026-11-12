@@ -22,8 +22,11 @@ interface State {
   glass: boolean
   spin: boolean
   rgb: string
+  theme: Theme
+  /** Whether the machine card on the right of the start screen is shown */
+  showDossier: boolean
   toasts: Toast[]
-  /** Teller som øker hver gang kameraet skal tilbake til utgangspunktet */
+  /** Counter that increases each time the camera should return to its starting point */
   homeTick: number
 
   pickDevice: (id: string) => void
@@ -36,17 +39,31 @@ interface State {
   setGoal: (g: Partial<Goal>) => void
   toggle: (key: 'exploded' | 'glass' | 'spin') => void
   setRgb: (c: string) => void
+  toggleTheme: () => void
+  toggleDossier: () => void
   dismiss: (key: number) => void
   home: () => void
 }
 
 let toastKey = 1
 
+export type Theme = 'dark' | 'light'
+
+function savedTheme(): Theme {
+  try {
+    const t = localStorage.getItem('theme')
+    if (t === 'light' || t === 'dark') return t
+  } catch {
+    /* storage blocked */
+  }
+  return 'dark'
+}
+
 export const RGB_CHOICES = ['#54e0ff', '#ff4fa3', '#9cff57', '#ffb13d', '#f4f6ff']
 
 export const useStore = create<State>((set, get) => ({
   mode: 'select',
-  deviceId: 'mid',
+  deviceId: 'empty',
   builds: Object.fromEntries(devices.map((d) => [d.id, { ...d.build }])),
   goals: Object.fromEntries(devices.map((d) => [d.id, { ...d.goal }])),
   selected: null,
@@ -55,13 +72,15 @@ export const useStore = create<State>((set, get) => ({
   glass: true,
   spin: false,
   rgb: RGB_CHOICES[0],
+  theme: savedTheme(),
+  showDossier: true,
   toasts: [],
   homeTick: 0,
 
   pickDevice: (id) => set({ deviceId: id, selected: null, hovered: null }),
   open: () => {
     const d = deviceById[get().deviceId]
-    // En bærbar er lukket rundt innmaten, så den åpnes med en gang
+    // A laptop is closed around its innards, so it opens right away
     set({ mode: 'inspect', selected: null, hovered: null, exploded: d.kind === 'laptop', spin: false })
   },
   back: () => set({ mode: 'select', selected: null, hovered: null, exploded: false, toasts: [] }),
@@ -97,6 +116,16 @@ export const useStore = create<State>((set, get) => ({
   },
   toggle: (key) => set({ [key]: !get()[key] } as Partial<State>),
   setRgb: (c) => set({ rgb: c }),
+  toggleTheme: () => {
+    const theme: Theme = get().theme === 'dark' ? 'light' : 'dark'
+    try {
+      localStorage.setItem('theme', theme)
+    } catch {
+      /* storage blocked */
+    }
+    set({ theme })
+  },
+  toggleDossier: () => set({ showDossier: !get().showDossier }),
   dismiss: (key) => set({ toasts: get().toasts.filter((t) => t.key !== key) }),
   home: () => set({ selected: null, homeTick: get().homeTick + 1 }),
 }))
