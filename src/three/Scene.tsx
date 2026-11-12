@@ -1,4 +1,4 @@
-import { ContactShadows, Environment, Grid, Lightformer } from '@react-three/drei'
+import { Environment, Grid, Lightformer } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
 import { Bloom, EffectComposer, ToneMapping, Vignette } from '@react-three/postprocessing'
 import { ToneMappingMode } from 'postprocessing'
@@ -8,8 +8,8 @@ import { DesktopModel } from './DesktopModel'
 import { LaptopModel } from './LaptopModel'
 
 const LOOK = {
-  dark: { stage: '#0c1416', cell: '#17302f', section: '#27504a', shadow: 0.62, vignette: 0.6, ambient: 0.5 },
-  light: { stage: '#e4ebe6', cell: '#c6d6cd', section: '#9fbcae', shadow: 0.38, vignette: 0.18, ambient: 0.9 },
+  dark: { stage: '#0c1416', cell: '#17302f', section: '#27504a',vignette: 0.6, ambient: 0.5 },
+  light: { stage: '#e4ebe6', cell: '#c6d6cd', section: '#9fbcae',vignette: 0.18, ambient: 0.9 },
 }
 
 function Studio({ ambient }: { ambient: number }) {
@@ -55,7 +55,6 @@ function Floor({ look }: { look: (typeof LOOK)['dark'] }) {
         fadeDistance={30}
         fadeStrength={1.8}
       />
-      <ContactShadows position={[0, 0.004, 0]} scale={18} far={6} blur={2.3} opacity={look.shadow} resolution={1024} color="#000000" />
     </>
   )
 }
